@@ -1,0 +1,43 @@
+{
+  "name": "meterlog",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npm run xano:routes && vite",
+    "build": "npm run xano:routes && tsc --noEmit && tsc -p xano/lambdas && vite build",
+    "preview": "vite preview",
+    "typecheck": "npm run xano:routes && tsc --noEmit && tsc -p xano/lambdas",
+    "xano:routes": "xanosdk routes ./xano/index.ts --emit xano/routes.gen.ts",
+    "xano:export": "npm run xano:routes && tsc --noEmit && tsc -p xano/lambdas && xanosdk export ./xano/index.ts --out workspace.json",
+    "xano:deploy": "npm run xano:routes && tsc --noEmit && tsc -p xano/lambdas && xanosdk deploy ./xano/index.ts --keep-data",
+    "xano:deploy:ephemeral": "npm run build && xanosdk deploy ./xano/index.ts --ephemeral --static ./frontend/dist",
+    "xano:deploy:frontend": "npm run build && xanosdk publish ./frontend/dist",
+    "xano:check": "xanosdk routes ./xano/index.ts --emit xano/routes.gen.ts --strict && tsc --noEmit && tsc -p xano/lambdas && xanosdk export ./xano/index.ts --check --strict",
+    "xano:test": "xanosdk test run-all"
+  },
+  "dependencies": {
+    "@xano/sdk": ">=1.0.7 <2.0.0",
+    "class-variance-authority": "^0.7.1",
+    "cn": "^0.4.0",
+    "lucide-react": "^0.475.0",
+    "radix-ui": "^1.6.7",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.5",
+    "@types/node": "^20.19.43",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^6.0.5",
+    "tailwindcss": "^4.1.5",
+    "tsx": "4.23.14",
+    "tw-animate-css": "^1.2.4",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16"
+  },
+  "engines": {
+    "node": ">=20.19"
+  }
+}

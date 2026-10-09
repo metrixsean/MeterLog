@@ -54,3 +54,42 @@ export const XANO_HOST: string =
   (typeof window !== "undefined" && window.XANO_HOST) ||
   import.meta.env.VITE_XANO_HOST ||
   "";
+
+import type { InferResponse } from "@xano/sdk";
+import type { signup, login } from "../../../xano/api/auth.js";
+import type { listMeters } from "../../../xano/api/meters.js";
+import { ROUTES, routePath, type RouteInputs, type RouteName } from "../../../xano/routes.gen.js";
+
+export type SignupBody = RouteInputs["POST signup"];
+export type LoginBody = RouteInputs["POST login"];
+export type CreateMeterBody = RouteInputs["POST create_meter"];
+export type Session = InferResponse<typeof login>;
+export type SignupSession = InferResponse<typeof signup>;
+export type Meter = InferResponse<typeof listMeters>[number];
+
+const TOKEN_KEY = "meterlog.token";
+
+export const getToken = () => localStorage.getItem(TOKEN_KEY);
+export const setToken = (token: string | null) =>
+  token ? localStorage.setItem(TOKEN_KEY, token) : localStorage.removeItem(TOKEN_KEY);
+
+async function call<T>(name: RouteName, body?: unknown): Promise<T> {
+  const token = getToken();
+  const headers: Record<string, string> = { "content-type": "application/json" };
+  if (token) headers.authorization = `Bearer ${token}`;
+  const res = await fetch(XANO_HOST + routePath(name as never), {
+    method: ROUTES[name].verb,
+    headers,
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.message ?? `Request failed (${res.status})`);
+  }
+  return res.json();
+}
+
+export const signupRequest = (body: SignupBody) => call<SignupSession>("POST signup", body);
+export const loginRequest = (body: LoginBody) => call<Session>("POST login", body);
+export const fetchMeters = () => call<Meter[]>("GET list_meters");
+export const createMeter = (body: CreateMeterBody) => call<Meter>("POST create_meter", body);

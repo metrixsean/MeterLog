@@ -86,6 +86,8 @@ export const ROUTES = {
   "POST signup": { verb: "POST", path: "/api:auth/signup" },
   "POST create_meter": { verb: "POST", path: "/api:meters/create_meter" },
   "GET list_meters": { verb: "GET", path: "/api:meters/list_meters" },
+  "POST create_reading": { verb: "POST", path: "/api:readings/create_reading" },
+  "GET meters/{meter_id}/readings": { verb: "GET", path: "/api:readings/meters/{meter_id}/readings" },
 } as const;
 
 /**
@@ -103,6 +105,8 @@ export function routePath(name: "POST login"): string;
 export function routePath(name: "POST signup"): string;
 export function routePath(name: "POST create_meter"): string;
 export function routePath(name: "GET list_meters"): string;
+export function routePath(name: "POST create_reading"): string;
+export function routePath(name: "GET meters/{meter_id}/readings", params: { "meter_id": string | number }): string;
 
 export function routePath(name: RouteName, params?: Record<string, string | number>): string {
   // Read through a widened view: a workspace with no endpoints at all makes
@@ -140,6 +144,14 @@ export type RouteInputs = {
     rollover_digits: number;
   };
   "GET list_meters": {};
+  "POST create_reading": {
+    meter_id: number;
+    value: number;
+    read_at: number | null;
+  };
+  "GET meters/{meter_id}/readings": {
+    meter_id: number;
+  };
 };
 
 /** The path params of every realtime channel, keyed exactly like CHANNELS. */

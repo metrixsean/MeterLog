@@ -29,3 +29,17 @@ export const meters = table({
   },
   index: [{ type: "btree", fields: [{ name: "household_id" }] }],
 });
+
+export const readings = table({
+  name: "readings",
+  schema: {
+    meter_id: f.tableRef(meters),
+    value: f.decimal({ required: true }),
+    read_at: f.timestamp({ required: true }),
+    photo: f.image(),
+    entered_by: f.tableRef(users),
+    flagged: f.bool(),
+    flag_reason: f.text(),
+  },
+  index: [{ type: "btree", fields: [{ name: "meter_id" }, { name: "read_at" }] }],
+});

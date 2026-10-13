@@ -11,14 +11,25 @@
       "canonical": "meters",
       "canonical_source": "code"
     },
+    "app:readings": {
+      "guid": "24a37a2a5cbc04b88e888ace0b00ecae",
+      "canonical": "readings",
+      "canonical_source": "code"
+    },
     "dbo:households": {
       "guid": "451ff5c12297beea4ca68a4efeb224ce"
     },
     "dbo:meters": {
       "guid": "f2ebd40d88f2390ff173af80d5b7fc61"
     },
+    "dbo:readings": {
+      "guid": "4f7cdc73c6208a73c02632165240ab13"
+    },
     "dbo:users": {
       "guid": "157d4a98d979cf04b9ccdb98dfc15229"
+    },
+    "function:check_reading": {
+      "guid": "ca6a80c0b528cda8af6829ca02a15c56"
     },
     "query:auth|POST|login": {
       "guid": "d39d74f907baeb484e9c93358362998a"
@@ -31,6 +42,12 @@
     },
     "query:meters|POST|create_meter": {
       "guid": "5250e9e40e24996dff0fe4ee3e3e2edd"
+    },
+    "query:readings|GET|meters/{meter_id}/readings": {
+      "guid": "714834af19a57fd4daaed663dab8ee7b"
+    },
+    "query:readings|POST|create_reading": {
+      "guid": "34acf2dcc9c36f64c11484951beebed5"
     }
   }
 }

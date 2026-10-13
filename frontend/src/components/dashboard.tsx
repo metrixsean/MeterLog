@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { MeterReadings } from "@/components/meter-readings";
 import { createMeter, fetchMeters, setToken, type Meter } from "@/lib/api";
 
 const KINDS = ["electric", "gas", "water"] as const;
@@ -11,6 +12,7 @@ const KINDS = ["electric", "gas", "water"] as const;
 export function Dashboard({ onLogout }: { onLogout: () => void }) {
   const [meters, setMeters] = useState<Meter[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Meter | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -49,6 +51,8 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
     onLogout();
   }
 
+  if (selected) return <MeterReadings meter={selected} onBack={() => setSelected(null)} />;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -60,7 +64,7 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
       {error && <p className="text-destructive text-sm">{error}</p>}
       <div className="grid gap-4 sm:grid-cols-2">
         {meters.map((m) => (
-          <Card key={m.id}>
+          <Card key={m.id} className="hover:bg-accent cursor-pointer" onClick={() => setSelected(m)}>
             <CardHeader>
               <CardTitle className="capitalize">{m.kind}</CardTitle>
               <CardDescription>

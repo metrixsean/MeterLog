@@ -16,6 +16,11 @@
       "canonical": "readings",
       "canonical_source": "code"
     },
+    "app:tariffs": {
+      "guid": "ec20b7c73dbb71ce950addf506cbfb0e",
+      "canonical": "tariffs",
+      "canonical_source": "code"
+    },
     "dbo:households": {
       "guid": "451ff5c12297beea4ca68a4efeb224ce"
     },
@@ -24,6 +29,9 @@
     },
     "dbo:readings": {
       "guid": "4f7cdc73c6208a73c02632165240ab13"
+    },
+    "dbo:tariffs": {
+      "guid": "bb28f21a8f1de7aaccc7acec26ff1581"
     },
     "dbo:users": {
       "guid": "157d4a98d979cf04b9ccdb98dfc15229"
@@ -48,6 +56,12 @@
     },
     "query:readings|POST|create_reading": {
       "guid": "34acf2dcc9c36f64c11484951beebed5"
+    },
+    "query:tariffs|GET|meters/{meter_id}/tariffs": {
+      "guid": "c06a94c608b4297714e70c02ef8e2fbb"
+    },
+    "query:tariffs|POST|create_tariff": {
+      "guid": "793b4e557c3f24664f570a9feb5649e6"
     }
   }
 }

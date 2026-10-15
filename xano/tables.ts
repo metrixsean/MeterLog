@@ -43,3 +43,15 @@ export const readings = table({
   },
   index: [{ type: "btree", fields: [{ name: "meter_id" }, { name: "read_at" }] }],
 });
+
+export const tariffs = table({
+  name: "tariffs",
+  schema: {
+    meter_id: f.tableRef(meters),
+    unit_price: f.decimal({ required: true }),
+    standing_charge_per_day: f.decimal({ required: true }),
+    valid_from: f.date({ required: true }),
+    valid_to: f.date(),
+  },
+  index: [{ type: "btree", fields: [{ name: "meter_id" }, { name: "valid_from" }] }],
+});

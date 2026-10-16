@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { ArrowLeft, TriangleAlert } from "lucide-react";
+import { TriangleAlert } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +13,7 @@ function localNow() {
   return d.toISOString().slice(0, 16);
 }
 
-export function MeterReadings({ meter, onBack }: { meter: Meter; onBack: () => void }) {
+export function MeterReadings({ meter, onSaved }: { meter: Pick<Meter, "id" | "unit">; onSaved: () => void }) {
   const [readings, setReadings] = useState<Reading[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -44,6 +44,7 @@ export function MeterReadings({ meter, onBack }: { meter: Meter; onBack: () => v
       });
       if (reading.flagged) setNotice(`Saved, but flagged: ${reading.flag_reason}`);
       form.reset();
+      onSaved();
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Request failed");
@@ -52,16 +53,6 @@ export function MeterReadings({ meter, onBack }: { meter: Meter; onBack: () => v
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Button variant="outline" size="icon" onClick={onBack} aria-label="Back to meters">
-          <ArrowLeft />
-        </Button>
-        <h1 className="text-2xl font-semibold tracking-tight capitalize">{meter.kind}</h1>
-        <span className="text-muted-foreground text-sm">
-          {meter.unit}
-          {meter.serial && ` / ${meter.serial}`}
-        </span>
-      </div>
       {error && <p className="text-destructive text-sm">{error}</p>}
       {notice && <p className="text-muted-foreground text-sm">{notice}</p>}
       <Card>
@@ -85,6 +76,7 @@ export function MeterReadings({ meter, onBack }: { meter: Meter; onBack: () => v
           </form>
         </CardContent>
       </Card>
+      <h2 className="text-lg font-semibold tracking-tight">Readings</h2>
       <table className="w-full text-sm">
         <thead className="text-muted-foreground text-left">
           <tr>

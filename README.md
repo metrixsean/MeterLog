@@ -4,8 +4,11 @@ Log your electricity, gas and water meter readings and see what you use. A house
 adds its meters, records readings by hand, and enters the tariff from each bill; the
 app works out consumption and estimates cost.
 
-Built so far: signup (creates a household), login, and meters per household. Readings,
-tariffs, billing periods and the weekly flagging task are not written yet.
+Built so far: signup (creates a household), login, meters, readings (flagged on entry when
+they drop or spike), tariffs through the API, and daily usage with a cost estimate from the
+active tariff. The dashboard shows each meter's last reading and this month's usage; a
+meter's page charts daily usage and lists its readings. The tariffs editor, billing
+periods, invites and the weekly flagging task are not written yet.
 
 The backend is TypeScript in [`xano/`](xano/), authored with the
 [Xano SDK](https://github.com/xano-sdk/sdk) and run on the Xano Engine. The frontend is

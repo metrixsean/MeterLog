@@ -1,5 +1,6 @@
 import { apiGroup, query, input, s, ref, inp, auth, col, expr } from "@xano/sdk";
 import { meters, users } from "../tables.js";
+import { meterGuard } from "./meter_guard.js";
 
 export const metersApi = apiGroup({ name: "meters", canonical: "meters" });
 
@@ -45,5 +46,15 @@ export const createMeter = query({
       as: "meter",
     }),
   ],
+  response: ref("meter"),
+});
+
+export const getMeter = query({
+  name: "meters/{meter_id}",
+  verb: "GET",
+  apiGroup: metersApi,
+  auth: users,
+  input: { meter_id: input.int({ required: true }) },
+  stack: [...meterGuard],
   response: ref("meter"),
 });

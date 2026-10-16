@@ -21,6 +21,11 @@
       "canonical": "tariffs",
       "canonical_source": "code"
     },
+    "app:usage": {
+      "guid": "24a9e0899ff081915138d78b3b4891bc",
+      "canonical": "usage",
+      "canonical_source": "code"
+    },
     "dbo:households": {
       "guid": "451ff5c12297beea4ca68a4efeb224ce"
     },
@@ -39,6 +44,9 @@
     "function:check_reading": {
       "guid": "ca6a80c0b528cda8af6829ca02a15c56"
     },
+    "function:meter_usage": {
+      "guid": "1c97e8ade28c110022e324aa8934ecdc"
+    },
     "query:auth|POST|login": {
       "guid": "d39d74f907baeb484e9c93358362998a"
     },
@@ -47,6 +55,9 @@
     },
     "query:meters|GET|list_meters": {
       "guid": "a9e9dea6e3d198f6502feedd18ab8282"
+    },
+    "query:meters|GET|meters/{meter_id}": {
+      "guid": "097ffbaa130ce52b6cd30cdf6ec9ff19"
     },
     "query:meters|POST|create_meter": {
       "guid": "5250e9e40e24996dff0fe4ee3e3e2edd"
@@ -62,6 +73,9 @@
     },
     "query:tariffs|POST|create_tariff": {
       "guid": "793b4e557c3f24664f570a9feb5649e6"
+    },
+    "query:usage|GET|meters/{meter_id}/usage": {
+      "guid": "e231e08e5b19ee78b861e0866ba2ee1e"
     }
   }
 }

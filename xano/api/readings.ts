@@ -1,5 +1,6 @@
-import { apiGroup, query, input, s, ref, inp, auth, c, col, expr, guard } from "@xano/sdk";
-import { meters, readings, users } from "../tables.js";
+import { apiGroup, query, input, s, ref, inp, auth, col, expr } from "@xano/sdk";
+import { readings, users } from "../tables.js";
+import { meterGuard } from "./meter_guard.js";
 import { checkReading } from "../functions/check_reading.js";
 
 export const readingsApi = apiGroup({ name: "readings", canonical: "readings" });
@@ -11,13 +12,7 @@ export const listReadings = query({
   auth: users,
   input: { meter_id: input.int({ required: true }) },
   stack: [
-    s.db.get({ table: users, fieldName: "id", fieldValue: auth("id"), as: "me" }),
-    s.db.get({ table: meters, fieldName: "id", fieldValue: inp("meter_id"), as: "meter" }),
-    guard.found("meter", { message: "Meter not found." }),
-    guard.require(expr(ref("meter.household_id"), "=", ref("me.household_id")), {
-      errorType: "notfound",
-      message: "Meter not found.",
-    }),
+    ...meterGuard,
     s.db.query({
       table: readings,
       where: expr(col("meter_id"), "=", inp("meter_id")),
@@ -39,13 +34,7 @@ export const createReading = query({
     read_at: input.timestamp({ required: true }),
   },
   stack: [
-    s.db.get({ table: users, fieldName: "id", fieldValue: auth("id"), as: "me" }),
-    s.db.get({ table: meters, fieldName: "id", fieldValue: inp("meter_id"), as: "meter" }),
-    guard.found("meter", { message: "Meter not found." }),
-    guard.require(expr(ref("meter.household_id"), "=", ref("me.household_id")), {
-      errorType: "notfound",
-      message: "Meter not found.",
-    }),
+    ...meterGuard,
     s.function.run({
       fn: checkReading,
       input: {

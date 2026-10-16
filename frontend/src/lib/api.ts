@@ -57,8 +57,9 @@ export const XANO_HOST: string =
 
 import type { InferResponse } from "@xano/sdk";
 import type { signup, login } from "../../../xano/api/auth.js";
-import type { listMeters } from "../../../xano/api/meters.js";
+import type { getMeter, listMeters } from "../../../xano/api/meters.js";
 import type { createReading, listReadings } from "../../../xano/api/readings.js";
+import type { getUsage } from "../../../xano/api/usage.js";
 import { ROUTES, routePath, type RouteInputs, type RouteName } from "../../../xano/routes.gen.js";
 
 export type SignupBody = RouteInputs["POST signup"];
@@ -67,15 +68,25 @@ export type CreateMeterBody = RouteInputs["POST create_meter"];
 export type Session = InferResponse<typeof login>;
 export type SignupSession = InferResponse<typeof signup>;
 export type Meter = InferResponse<typeof listMeters>[number];
+export type MeterRow = InferResponse<typeof getMeter>;
 export type CreateReadingBody = RouteInputs["POST create_reading"];
 export type Reading = InferResponse<typeof listReadings>[number];
 export type NewReading = InferResponse<typeof createReading>;
+export type UsageQuery = Omit<RouteInputs["GET meters/{meter_id}/usage"], "meter_id">;
+export type Usage = InferResponse<typeof getUsage>;
 
 const TOKEN_KEY = "meterlog.token";
 
 export const getToken = () => localStorage.getItem(TOKEN_KEY);
 export const setToken = (token: string | null) =>
   token ? localStorage.setItem(TOKEN_KEY, token) : localStorage.removeItem(TOKEN_KEY);
+
+const signedOut = new Set<() => void>();
+
+export function onSignedOut(fn: () => void) {
+  signedOut.add(fn);
+  return () => void signedOut.delete(fn);
+}
 
 async function call<T>(
   name: RouteName,
@@ -85,11 +96,20 @@ async function call<T>(
   const token = getToken();
   const headers: Record<string, string> = { "content-type": "application/json" };
   if (token) headers.authorization = `Bearer ${token}`;
-  const res = await fetch(XANO_HOST + routePath(name as never, params as never), {
-    method: ROUTES[name].verb,
+  const verb = ROUTES[name].verb;
+  let url = XANO_HOST + routePath(name as never, params as never);
+  if (verb === "GET" && body !== undefined) {
+    url += "?" + new URLSearchParams(body as Record<string, string>);
+  }
+  const res = await fetch(url, {
+    method: verb,
     headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
+    body: verb === "GET" || body === undefined ? undefined : JSON.stringify(body),
   });
+  if (res.status === 401 && token) {
+    setToken(null);
+    signedOut.forEach((fn) => fn());
+  }
   if (!res.ok) {
     const err = await res.json().catch(() => null);
     throw new Error(err?.message ?? `Request failed (${res.status})`);
@@ -101,7 +121,11 @@ export const signupRequest = (body: SignupBody) => call<SignupSession>("POST sig
 export const loginRequest = (body: LoginBody) => call<Session>("POST login", body);
 export const fetchMeters = () => call<Meter[]>("GET list_meters");
 export const createMeter = (body: CreateMeterBody) => call<Meter>("POST create_meter", body);
+export const fetchMeter = (meterId: number) =>
+  call<MeterRow>("GET meters/{meter_id}", undefined, { meter_id: meterId });
 export const fetchReadings = (meterId: number) =>
   call<Reading[]>("GET meters/{meter_id}/readings", undefined, { meter_id: meterId });
 export const createReadingRequest = (body: CreateReadingBody) =>
   call<NewReading>("POST create_reading", body);
+export const fetchUsage = (meterId: number, query: UsageQuery) =>
+  call<Usage>("GET meters/{meter_id}/usage", query, { meter_id: meterId });

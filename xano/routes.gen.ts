@@ -82,6 +82,7 @@ function fillParams(
 }
 
 export const ROUTES = {
+  "POST invite": { verb: "POST", path: "/api:auth/invite" },
   "POST login": { verb: "POST", path: "/api:auth/login" },
   "POST signup": { verb: "POST", path: "/api:auth/signup" },
   "POST create_meter": { verb: "POST", path: "/api:meters/create_meter" },
@@ -105,6 +106,7 @@ type ManyRoutes<N> = [(N extends unknown ? (x: N) => void : never) extends (x: i
 
 /** A union of route names (e.g. a `key: RouteName` parameter): params checked at runtime. */
 export function routePath<N extends RouteName>(name: ManyRoutes<N>, params?: Record<string, string | number>): string;
+export function routePath(name: "POST invite"): string;
 export function routePath(name: "POST login"): string;
 export function routePath(name: "POST signup"): string;
 export function routePath(name: "POST create_meter"): string;
@@ -136,6 +138,10 @@ export function routePath(name: RouteName, params?: Record<string, string | numb
  * the linked table's columns, which is what the server accepts.
  */
 export type RouteInputs = {
+  "POST invite": {
+    email: string;
+    password: string;
+  };
   "POST login": {
     email: string;
     password: string;

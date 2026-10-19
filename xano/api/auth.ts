@@ -1,4 +1,4 @@
-import { apiGroup, query, input, s, ref, inp, c, expr, expect, resp } from "@xano/sdk";
+import { apiGroup, query, input, s, ref, inp, c, expr, expect, resp, auth } from "@xano/sdk";
 import { households, users } from "../tables.js";
 
 export const authApi = apiGroup({ name: "auth", canonical: "auth" });
@@ -75,4 +75,30 @@ export const login = query({
     s.security.create_auth_token({ table: users, id: ref("u.id"), as: "token" }),
   ],
   response: { token: ref("token"), household_id: ref("u.household_id") },
+});
+
+export const invite = query({
+  name: "invite",
+  verb: "POST",
+  apiGroup: authApi,
+  auth: users,
+  input: {
+    email: input.email({ required: true }),
+    password: input.text({ required: true, sensitive: true }),
+  },
+  stack: [
+    s.db.get({ table: users, fieldName: "id", fieldValue: auth("id"), as: "me" }),
+    s.db.has({ table: users, fieldName: "email", fieldValue: inp("email"), as: "taken" }),
+    s.precondition({
+      expr: expr(ref("taken"), "=", c.bool(false)),
+      error_type: "badrequest",
+      error: c.text("Email already registered."),
+    }),
+    s.db.add({
+      table: users,
+      row: { household_id: ref("me.household_id"), email: inp("email"), password: inp("password") },
+      as: "user",
+    }),
+  ],
+  response: { id: ref("user.id"), email: ref("user.email"), household_id: ref("user.household_id") },
 });

@@ -47,6 +47,9 @@
     "function:meter_usage": {
       "guid": "1c97e8ade28c110022e324aa8934ecdc"
     },
+    "query:auth|POST|invite": {
+      "guid": "73e1a76b8acd473be9511f3f82048a99"
+    },
     "query:auth|POST|login": {
       "guid": "d39d74f907baeb484e9c93358362998a"
     },

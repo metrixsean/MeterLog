@@ -1,6 +1,6 @@
 import { workspace } from "@xano/sdk";
 import { households, users, meters, readings, tariffs } from "./tables.js";
-import { authApi, signup, login } from "./api/auth.js";
+import { authApi, signup, login, invite } from "./api/auth.js";
 import { metersApi, listMeters, createMeter, getMeter } from "./api/meters.js";
 import { readingsApi, listReadings, createReading } from "./api/readings.js";
 import { tariffsApi, listTariffs, createTariff } from "./api/tariffs.js";
@@ -12,4 +12,4 @@ export default workspace("meterlog")
   .registerTables([households, users, meters, readings, tariffs])
   .registerFunctions([checkReading, meterUsage])
   .registerApiGroups([authApi, metersApi, readingsApi, tariffsApi, usageApi])
-  .registerQueries([signup, login, listMeters, createMeter, getMeter, listReadings, createReading, listTariffs, createTariff, getUsage]);
+  .registerQueries([signup, login, invite, listMeters, createMeter, getMeter, listReadings, createReading, listTariffs, createTariff, getUsage]);

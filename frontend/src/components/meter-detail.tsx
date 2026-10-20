@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Receipt } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -66,6 +66,10 @@ export function MeterDetail({ id }: { id: number }) {
           {meter.unit}
           {meter.serial && ` / ${meter.serial}`}
         </span>
+        <Button variant="outline" size="sm" className="ml-auto" onClick={() => navigate(`/meters/${id}/tariffs`)}>
+          <Receipt />
+          Tariffs
+        </Button>
       </div>
       {error && <p className="text-destructive text-sm">{error}</p>}
       <Card>

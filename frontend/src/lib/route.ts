@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 
-export type Route = { page: "dashboard" } | { page: "meter"; id: number };
+export type Route =
+  | { page: "dashboard" }
+  | { page: "meter"; id: number }
+  | { page: "tariffs"; id: number };
 
 function parse(hash: string): Route {
-  const m = /^#\/meters\/(\d+)$/.exec(hash);
-  return m ? { page: "meter", id: Number(m[1]) } : { page: "dashboard" };
+  const m = /^#\/meters\/(\d+)(\/tariffs)?$/.exec(hash);
+  if (!m) return { page: "dashboard" };
+  return { page: m[2] ? "tariffs" : "meter", id: Number(m[1]) };
 }
 
 export function navigate(path: string) {

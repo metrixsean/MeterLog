@@ -4,6 +4,7 @@ import { Dashboard } from "@/components/dashboard";
 import { AuthForm } from "@/components/auth-form";
 import { MeterDetail } from "@/components/meter-detail";
 import { ModeToggle } from "@/components/mode-toggle";
+import { TariffsEditor } from "@/components/tariffs-editor";
 import { getToken, onSignedOut } from "@/lib/api";
 import { useRoute } from "@/lib/route";
 
@@ -25,6 +26,8 @@ export default function App() {
         <AuthForm onDone={() => setAuthed(true)} />
       ) : route.page === "meter" ? (
         <MeterDetail key={route.id} id={route.id} />
+      ) : route.page === "tariffs" ? (
+        <TariffsEditor key={route.id} meterId={route.id} />
       ) : (
         <Dashboard onLogout={() => setAuthed(false)} />
       )}

@@ -59,6 +59,7 @@ import type { InferResponse } from "@xano/sdk";
 import type { signup, login } from "../../../xano/api/auth.js";
 import type { getMeter, listMeters } from "../../../xano/api/meters.js";
 import type { createReading, listReadings } from "../../../xano/api/readings.js";
+import type { createTariff, listTariffs, updateTariff } from "../../../xano/api/tariffs.js";
 import type { getUsage } from "../../../xano/api/usage.js";
 import { ROUTES, routePath, type RouteInputs, type RouteName } from "../../../xano/routes.gen.js";
 
@@ -74,6 +75,11 @@ export type Reading = InferResponse<typeof listReadings>[number];
 export type NewReading = InferResponse<typeof createReading>;
 export type UsageQuery = Omit<RouteInputs["GET meters/{meter_id}/usage"], "meter_id">;
 export type Usage = InferResponse<typeof getUsage>;
+export type CreateTariffBody = RouteInputs["POST create_tariff"];
+export type UpdateTariffBody = Omit<RouteInputs["PATCH tariffs/{tariff_id}"], "tariff_id">;
+export type Tariff = InferResponse<typeof listTariffs>[number];
+export type NewTariff = InferResponse<typeof createTariff>;
+export type UpdatedTariff = InferResponse<typeof updateTariff>;
 
 const TOKEN_KEY = "meterlog.token";
 
@@ -129,3 +135,10 @@ export const createReadingRequest = (body: CreateReadingBody) =>
   call<NewReading>("POST create_reading", body);
 export const fetchUsage = (meterId: number, query: UsageQuery) =>
   call<Usage>("GET meters/{meter_id}/usage", query, { meter_id: meterId });
+export const fetchTariffs = (meterId: number) =>
+  call<Tariff[]>("GET meters/{meter_id}/tariffs", undefined, { meter_id: meterId });
+export const createTariffRequest = (body: CreateTariffBody) => call<NewTariff>("POST create_tariff", body);
+export const updateTariffRequest = (tariffId: number, body: UpdateTariffBody) =>
+  call<UpdatedTariff>("PATCH tariffs/{tariff_id}", body, { tariff_id: tariffId });
+export const deleteTariffRequest = (tariffId: number) =>
+  call<unknown>("DELETE tariffs/{tariff_id}", undefined, { tariff_id: tariffId });

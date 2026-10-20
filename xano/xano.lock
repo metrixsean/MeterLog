@@ -71,8 +71,14 @@
     "query:readings|POST|create_reading": {
       "guid": "34acf2dcc9c36f64c11484951beebed5"
     },
+    "query:tariffs|DELETE|tariffs/{tariff_id}": {
+      "guid": "ea93fd9dd995664606b5931b672e9bb7"
+    },
     "query:tariffs|GET|meters/{meter_id}/tariffs": {
       "guid": "c06a94c608b4297714e70c02ef8e2fbb"
+    },
+    "query:tariffs|PATCH|tariffs/{tariff_id}": {
+      "guid": "c681bf820dec291a813590f45a253878"
     },
     "query:tariffs|POST|create_tariff": {
       "guid": "793b4e557c3f24664f570a9feb5649e6"

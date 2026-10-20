@@ -92,6 +92,8 @@ export const ROUTES = {
   "GET meters/{meter_id}/readings": { verb: "GET", path: "/api:readings/meters/{meter_id}/readings" },
   "POST create_tariff": { verb: "POST", path: "/api:tariffs/create_tariff" },
   "GET meters/{meter_id}/tariffs": { verb: "GET", path: "/api:tariffs/meters/{meter_id}/tariffs" },
+  "DELETE tariffs/{tariff_id}": { verb: "DELETE", path: "/api:tariffs/tariffs/{tariff_id}" },
+  "PATCH tariffs/{tariff_id}": { verb: "PATCH", path: "/api:tariffs/tariffs/{tariff_id}" },
   "GET meters/{meter_id}/usage": { verb: "GET", path: "/api:usage/meters/{meter_id}/usage" },
 } as const;
 
@@ -116,6 +118,8 @@ export function routePath(name: "POST create_reading"): string;
 export function routePath(name: "GET meters/{meter_id}/readings", params: { "meter_id": string | number }): string;
 export function routePath(name: "POST create_tariff"): string;
 export function routePath(name: "GET meters/{meter_id}/tariffs", params: { "meter_id": string | number }): string;
+export function routePath(name: "DELETE tariffs/{tariff_id}", params: { "tariff_id": string | number }): string;
+export function routePath(name: "PATCH tariffs/{tariff_id}", params: { "tariff_id": string | number }): string;
 export function routePath(name: "GET meters/{meter_id}/usage", params: { "meter_id": string | number }): string;
 
 export function routePath(name: RouteName, params?: Record<string, string | number>): string {
@@ -178,6 +182,16 @@ export type RouteInputs = {
   };
   "GET meters/{meter_id}/tariffs": {
     meter_id: number;
+  };
+  "DELETE tariffs/{tariff_id}": {
+    tariff_id: number;
+  };
+  "PATCH tariffs/{tariff_id}": {
+    tariff_id: number;
+    unit_price: number;
+    standing_charge_per_day: number;
+    valid_from: string | null;
+    valid_to?: string | null;
   };
   "GET meters/{meter_id}/usage": {
     meter_id: number;

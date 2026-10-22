@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { loginRequest, setToken, signupRequest } from "@/lib/api";
 
-export function AuthForm({ onDone }: { onDone: () => void }) {
+export function AuthForm({ expired, onDone }: { expired?: boolean; onDone: () => void }) {
   const [signingUp, setSigningUp] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -38,6 +38,9 @@ export function AuthForm({ onDone }: { onDone: () => void }) {
       </CardHeader>
       <CardContent>
         <form onSubmit={submit} className="space-y-4">
+          {expired && !error && (
+            <p className="text-muted-foreground text-sm">Your session expired. Log in again.</p>
+          )}
           {signingUp && (
             <div className="space-y-2">
               <Label htmlFor="household_name">Household name</Label>

@@ -10,9 +10,23 @@ import { useRoute } from "@/lib/route";
 
 export default function App() {
   const [authed, setAuthed] = useState(() => getToken() !== null);
+  const [expired, setExpired] = useState(false);
   const route = useRoute();
 
-  useEffect(() => onSignedOut(() => setAuthed(false)), []);
+  useEffect(
+    () =>
+      onSignedOut(() => {
+        setAuthed(false);
+        setExpired(true);
+      }),
+    [],
+  );
+
+  useEffect(() => {
+    const sync = () => setAuthed(getToken() !== null);
+    window.addEventListener("storage", sync);
+    return () => window.removeEventListener("storage", sync);
+  }, []);
 
   return (
     <main className="mx-auto min-h-screen max-w-2xl p-8">
@@ -23,7 +37,13 @@ export default function App() {
         <ModeToggle />
       </div>
       {!authed ? (
-        <AuthForm onDone={() => setAuthed(true)} />
+        <AuthForm
+          expired={expired}
+          onDone={() => {
+            setAuthed(true);
+            setExpired(false);
+          }}
+        />
       ) : route.page === "meter" ? (
         <MeterDetail key={route.id} id={route.id} />
       ) : route.page === "tariffs" ? (

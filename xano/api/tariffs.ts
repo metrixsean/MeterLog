@@ -2,7 +2,7 @@ import {
   apiGroup, query, input, s, ref, inp, auth, c, col, expr, or, guard, statements, expect, resp,
 } from "@xano/sdk";
 import { meters, tariffs, users } from "../tables.js";
-import { meterGuard } from "./meter_guard.js";
+import { meterGuard, mockedMeterGuard } from "./meter_guard.js";
 
 export const tariffsApi = apiGroup({ name: "tariffs", canonical: "tariffs" });
 
@@ -40,6 +40,16 @@ const TARIFF = { id: 7, meter_id: 3, unit_price: 0.3, standing_charge_per_day: 0
 const ownHousehold: GuardMock = { me: { id: 1, household_id: 1 }, tariff: TARIFF, meter: { id: 3, household_id: 1 } };
 const otherHousehold: GuardMock = { ...ownHousehold, meter: { id: 3, household_id: 2 } };
 
+const ownMeter = { me: ownHousehold.me, meter: ownHousehold.meter };
+
+const createInput = (valid_to: string | null) => ({
+  meter_id: c.int(3),
+  unit_price: c.decimal(0.3),
+  standing_charge_per_day: c.decimal(0.5),
+  valid_from: c.text("2026-01-01"),
+  valid_to: valid_to === null ? c.null() : c.text(valid_to),
+});
+
 const editInput = (valid_to: string | null) => ({
   tariff_id: c.int(7),
   unit_price: c.decimal(0.25),
@@ -73,7 +83,11 @@ export const createTariff = query({
   auth: users,
   input: { meter_id: input.int({ required: true }), ...rates },
   stack: [
-    ...meterGuard,
+    ...mockedMeterGuard({
+      "creates tariff on own meter": ownMeter,
+      "other household is not found": { ...ownMeter, meter: { id: 3, household_id: 2 } },
+      "rejects end before start": ownMeter,
+    }),
     validRange,
     s.db.add({
       table: tariffs,
@@ -85,9 +99,27 @@ export const createTariff = query({
         valid_to: inp("valid_to"),
       },
       as: "tariff",
+      mock: { "creates tariff on own meter": c.obj(TARIFF) },
     }),
   ],
   response: ref("tariff"),
+  tests: [
+    {
+      name: "creates tariff on own meter",
+      input: createInput(null),
+      expect: [expect.to_equal(resp("meter_id"), c.int(3))],
+    },
+    {
+      name: "other household is not found",
+      input: createInput(null),
+      expect: [expect.to_throw(c.text("Meter not found."))],
+    },
+    {
+      name: "rejects end before start",
+      input: createInput("2025-12-31"),
+      expect: [expect.to_throw(c.text("valid_to is before valid_from."))],
+    },
+  ],
 });
 
 export const updateTariff = query({

@@ -5,11 +5,11 @@ adds its meters, records readings by hand, and enters the tariff from each bill;
 app works out consumption and estimates cost.
 
 Built so far: signup (creates a household), login, an invite endpoint, meters, readings
-(flagged on entry when they drop or spike), tariffs, and daily usage with a cost estimate
-from the active tariff. The dashboard shows each meter's last reading and this month's
-usage; a meter's page charts daily usage and lists its readings, and links to an editor
-for its tariffs. Billing periods, the invite page and the weekly flagging task are not
-written yet.
+(flagged on entry when they drop or spike), tariffs, billing periods, and daily usage with
+a cost estimate from the active tariff. The dashboard shows each meter's last reading and
+this month's usage; a meter's page charts daily usage and lists its readings, and links to
+an editor for its tariffs and a list of its bills, each compared with the cost estimated
+for the same dates. The invite page and the weekly flagging task are not written yet.
 
 The backend is TypeScript in [`xano/`](xano/), authored with the
 [Xano SDK](https://github.com/xano-sdk/sdk) and run on the Xano Engine. The frontend is

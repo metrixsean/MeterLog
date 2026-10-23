@@ -61,6 +61,12 @@ import type { getMeter, listMeters } from "../../../xano/api/meters.js";
 import type { createReading, listReadings } from "../../../xano/api/readings.js";
 import type { createTariff, listTariffs, updateTariff } from "../../../xano/api/tariffs.js";
 import type { getUsage } from "../../../xano/api/usage.js";
+import type {
+  createBillingPeriod,
+  getPeriodSummary,
+  listBillingPeriods,
+  updateBillingPeriod,
+} from "../../../xano/api/billing_periods.js";
 import { ROUTES, routePath, type RouteInputs, type RouteName } from "../../../xano/routes.gen.js";
 
 export type SignupBody = RouteInputs["POST signup"];
@@ -80,6 +86,12 @@ export type UpdateTariffBody = Omit<RouteInputs["PATCH tariffs/{tariff_id}"], "t
 export type Tariff = InferResponse<typeof listTariffs>[number];
 export type NewTariff = InferResponse<typeof createTariff>;
 export type UpdatedTariff = InferResponse<typeof updateTariff>;
+export type CreateBillingPeriodBody = RouteInputs["POST create_billing_period"];
+export type UpdateBillingPeriodBody = Omit<RouteInputs["PATCH billing_periods/{period_id}"], "period_id">;
+export type BillingPeriod = InferResponse<typeof listBillingPeriods>[number];
+export type NewBillingPeriod = InferResponse<typeof createBillingPeriod>;
+export type UpdatedBillingPeriod = InferResponse<typeof updateBillingPeriod>;
+export type PeriodSummary = InferResponse<typeof getPeriodSummary>;
 
 const TOKEN_KEY = "meterlog.token";
 
@@ -142,3 +154,13 @@ export const updateTariffRequest = (tariffId: number, body: UpdateTariffBody) =>
   call<UpdatedTariff>("PATCH tariffs/{tariff_id}", body, { tariff_id: tariffId });
 export const deleteTariffRequest = (tariffId: number) =>
   call<unknown>("DELETE tariffs/{tariff_id}", undefined, { tariff_id: tariffId });
+export const fetchBillingPeriods = (meterId: number) =>
+  call<BillingPeriod[]>("GET meters/{meter_id}/billing_periods", undefined, { meter_id: meterId });
+export const createBillingPeriodRequest = (body: CreateBillingPeriodBody) =>
+  call<NewBillingPeriod>("POST create_billing_period", body);
+export const updateBillingPeriodRequest = (periodId: number, body: UpdateBillingPeriodBody) =>
+  call<UpdatedBillingPeriod>("PATCH billing_periods/{period_id}", body, { period_id: periodId });
+export const deleteBillingPeriodRequest = (periodId: number) =>
+  call<unknown>("DELETE billing_periods/{period_id}", undefined, { period_id: periodId });
+export const fetchPeriodSummary = (periodId: number) =>
+  call<PeriodSummary>("GET billing_periods/{period_id}/summary", undefined, { period_id: periodId });

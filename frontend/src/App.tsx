@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { BillingPeriods } from "@/components/billing-periods";
 import { Dashboard } from "@/components/dashboard";
 import { AuthForm } from "@/components/auth-form";
 import { MeterDetail } from "@/components/meter-detail";
@@ -48,6 +49,8 @@ export default function App() {
         <MeterDetail key={route.id} id={route.id} />
       ) : route.page === "tariffs" ? (
         <TariffsEditor key={route.id} meterId={route.id} />
+      ) : route.page === "billing" ? (
+        <BillingPeriods key={route.id} meterId={route.id} />
       ) : (
         <Dashboard onLogout={() => setAuthed(false)} />
       )}

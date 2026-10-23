@@ -3,12 +3,16 @@ import { useEffect, useState } from "react";
 export type Route =
   | { page: "dashboard" }
   | { page: "meter"; id: number }
-  | { page: "tariffs"; id: number };
+  | { page: "tariffs"; id: number }
+  | { page: "billing"; id: number };
 
 function parse(hash: string): Route {
-  const m = /^#\/meters\/(\d+)(\/tariffs)?$/.exec(hash);
+  const m = /^#\/meters\/(\d+)(?:\/(tariffs|billing))?$/.exec(hash);
   if (!m) return { page: "dashboard" };
-  return { page: m[2] ? "tariffs" : "meter", id: Number(m[1]) };
+  const id = Number(m[1]);
+  if (m[2] === "tariffs") return { page: "tariffs", id };
+  if (m[2] === "billing") return { page: "billing", id };
+  return { page: "meter", id };
 }
 
 export function navigate(path: string) {

@@ -85,6 +85,11 @@ export const ROUTES = {
   "POST invite": { verb: "POST", path: "/api:auth/invite" },
   "POST login": { verb: "POST", path: "/api:auth/login" },
   "POST signup": { verb: "POST", path: "/api:auth/signup" },
+  "DELETE billing_periods/{period_id}": { verb: "DELETE", path: "/api:billing/billing_periods/{period_id}" },
+  "PATCH billing_periods/{period_id}": { verb: "PATCH", path: "/api:billing/billing_periods/{period_id}" },
+  "GET billing_periods/{period_id}/summary": { verb: "GET", path: "/api:billing/billing_periods/{period_id}/summary" },
+  "POST create_billing_period": { verb: "POST", path: "/api:billing/create_billing_period" },
+  "GET meters/{meter_id}/billing_periods": { verb: "GET", path: "/api:billing/meters/{meter_id}/billing_periods" },
   "POST create_meter": { verb: "POST", path: "/api:meters/create_meter" },
   "GET list_meters": { verb: "GET", path: "/api:meters/list_meters" },
   "GET meters/{meter_id}": { verb: "GET", path: "/api:meters/meters/{meter_id}" },
@@ -111,6 +116,11 @@ export function routePath<N extends RouteName>(name: ManyRoutes<N>, params?: Rec
 export function routePath(name: "POST invite"): string;
 export function routePath(name: "POST login"): string;
 export function routePath(name: "POST signup"): string;
+export function routePath(name: "DELETE billing_periods/{period_id}", params: { "period_id": string | number }): string;
+export function routePath(name: "PATCH billing_periods/{period_id}", params: { "period_id": string | number }): string;
+export function routePath(name: "GET billing_periods/{period_id}/summary", params: { "period_id": string | number }): string;
+export function routePath(name: "POST create_billing_period"): string;
+export function routePath(name: "GET meters/{meter_id}/billing_periods", params: { "meter_id": string | number }): string;
 export function routePath(name: "POST create_meter"): string;
 export function routePath(name: "GET list_meters"): string;
 export function routePath(name: "GET meters/{meter_id}", params: { "meter_id": string | number }): string;
@@ -154,6 +164,27 @@ export type RouteInputs = {
     email: string;
     password: string;
     household_name: string;
+  };
+  "DELETE billing_periods/{period_id}": {
+    period_id: number;
+  };
+  "PATCH billing_periods/{period_id}": {
+    period_id: number;
+    start_date: string | null;
+    end_date: string | null;
+    billed_amount: number;
+  };
+  "GET billing_periods/{period_id}/summary": {
+    period_id: number;
+  };
+  "POST create_billing_period": {
+    meter_id: number;
+    start_date: string | null;
+    end_date: string | null;
+    billed_amount: number;
+  };
+  "GET meters/{meter_id}/billing_periods": {
+    meter_id: number;
   };
   "POST create_meter": {
     kind: "electric" | "gas" | "water";

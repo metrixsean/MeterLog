@@ -6,6 +6,11 @@
       "canonical": "auth",
       "canonical_source": "code"
     },
+    "app:billing": {
+      "guid": "0c37ccae0d38d63bf4c02be8aec88cfe",
+      "canonical": "billing",
+      "canonical_source": "code"
+    },
     "app:meters": {
       "guid": "45ec83951c2cfdb45ede21f8c09e27f2",
       "canonical": "meters",
@@ -25,6 +30,9 @@
       "guid": "24a9e0899ff081915138d78b3b4891bc",
       "canonical": "usage",
       "canonical_source": "code"
+    },
+    "dbo:billing_periods": {
+      "guid": "41185bf5290b1cffd0ad396ce9dd1d96"
     },
     "dbo:households": {
       "guid": "451ff5c12297beea4ca68a4efeb224ce"
@@ -47,6 +55,9 @@
     "function:meter_usage": {
       "guid": "1c97e8ade28c110022e324aa8934ecdc"
     },
+    "function:period_summary": {
+      "guid": "576bf8164c17953ada492766f67a10f7"
+    },
     "query:auth|POST|invite": {
       "guid": "73e1a76b8acd473be9511f3f82048a99"
     },
@@ -55,6 +66,21 @@
     },
     "query:auth|POST|signup": {
       "guid": "89d6bc5d06c58cc80bb611a9fc64b12c"
+    },
+    "query:billing|DELETE|billing_periods/{period_id}": {
+      "guid": "79592e37bc18fdbf43cee5f1f7b42056"
+    },
+    "query:billing|GET|billing_periods/{period_id}/summary": {
+      "guid": "e6948181b28f01f2b8ec5f9ae896a0b3"
+    },
+    "query:billing|GET|meters/{meter_id}/billing_periods": {
+      "guid": "26d8854f9a6a89b3117ad30cf47f5e13"
+    },
+    "query:billing|PATCH|billing_periods/{period_id}": {
+      "guid": "cb5e881066d996fb0a6c6fd283ba84eb"
+    },
+    "query:billing|POST|create_billing_period": {
+      "guid": "544a88de303631412d0d6ad476ca25eb"
     },
     "query:meters|GET|list_meters": {
       "guid": "a9e9dea6e3d198f6502feedd18ab8282"

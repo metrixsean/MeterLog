@@ -55,3 +55,14 @@ export const tariffs = table({
   },
   index: [{ type: "btree", fields: [{ name: "meter_id" }, { name: "valid_from" }] }],
 });
+
+export const billingPeriods = table({
+  name: "billing_periods",
+  schema: {
+    meter_id: f.tableRef(meters),
+    start_date: f.date({ required: true }),
+    end_date: f.date({ required: true }),
+    billed_amount: f.decimal({ required: true }),
+  },
+  index: [{ type: "btree", fields: [{ name: "meter_id" }, { name: "start_date" }] }],
+});

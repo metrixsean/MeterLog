@@ -52,6 +52,9 @@
     "function:check_reading": {
       "guid": "ca6a80c0b528cda8af6829ca02a15c56"
     },
+    "function:flag_readings": {
+      "guid": "8e278e005dfdae0cfa221d82c2fb8075"
+    },
     "function:meter_usage": {
       "guid": "1c97e8ade28c110022e324aa8934ecdc"
     },
@@ -111,6 +114,9 @@
     },
     "query:usage|GET|meters/{meter_id}/usage": {
       "guid": "e231e08e5b19ee78b861e0866ba2ee1e"
+    },
+    "task:flag_readings_weekly": {
+      "guid": "ed364ebb111257982ea4ee5ccd4178ac"
     }
   }
 }

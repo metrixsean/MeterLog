@@ -77,6 +77,12 @@ export const login = query({
   response: { token: ref("token"), household_id: ref("u.household_id") },
 });
 
+const inviteMe = {
+  "adds user to own household": c.obj({ id: 1, household_id: 5 }),
+  "rejects taken email": c.obj({ id: 1, household_id: 5 }),
+};
+const inviteInput = { email: c.text("b@example.com"), password: c.text("correct horse") };
+
 export const invite = query({
   name: "invite",
   verb: "POST",
@@ -87,8 +93,14 @@ export const invite = query({
     password: input.text({ required: true, sensitive: true }),
   },
   stack: [
-    s.db.get({ table: users, fieldName: "id", fieldValue: auth("id"), as: "me" }),
-    s.db.has({ table: users, fieldName: "email", fieldValue: inp("email"), as: "taken" }),
+    s.db.get({ table: users, fieldName: "id", fieldValue: auth("id"), as: "me", mock: inviteMe }),
+    s.db.has({
+      table: users,
+      fieldName: "email",
+      fieldValue: inp("email"),
+      as: "taken",
+      mock: { "adds user to own household": c.bool(false), "rejects taken email": c.bool(true) },
+    }),
     s.precondition({
       expr: expr(ref("taken"), "=", c.bool(false)),
       error_type: "badrequest",
@@ -98,7 +110,20 @@ export const invite = query({
       table: users,
       row: { household_id: ref("me.household_id"), email: inp("email"), password: inp("password") },
       as: "user",
+      mock: { "adds user to own household": c.obj({ id: 2, email: "b@example.com", household_id: 5 }) },
     }),
   ],
   response: { id: ref("user.id"), email: ref("user.email"), household_id: ref("user.household_id") },
+  tests: [
+    {
+      name: "adds user to own household",
+      input: inviteInput,
+      expect: [expect.to_equal(resp("household_id"), c.int(5))],
+    },
+    {
+      name: "rejects taken email",
+      input: inviteInput,
+      expect: [expect.to_throw(c.text("Email already registered."))],
+    },
+  ],
 });

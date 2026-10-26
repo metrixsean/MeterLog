@@ -16,10 +16,13 @@ import {
 import { checkReading } from "./functions/check_reading.js";
 import { meterUsage } from "./functions/meter_usage.js";
 import { periodSummary } from "./functions/period_summary.js";
+import { flagReadings } from "./functions/flag_readings.js";
+import { flagReadingsWeekly } from "./tasks/flag_readings_weekly.js";
 
 export default workspace("meterlog")
   .registerTables([households, users, meters, readings, tariffs, billingPeriods])
-  .registerFunctions([checkReading, meterUsage, periodSummary])
+  .registerFunctions([checkReading, meterUsage, periodSummary, flagReadings])
+  .registerTasks([flagReadingsWeekly])
   .registerApiGroups([authApi, metersApi, readingsApi, tariffsApi, usageApi, billingApi])
   .registerQueries([
     signup, login, invite,

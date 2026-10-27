@@ -5,11 +5,12 @@ import { readings } from "../tables.js";
 const DAY = 86_400_000;
 const T0 = 1_760_000_000_000;
 
-const row = (id: number, value: number, day: number, flagged = false) => ({
+const row = (id: number, value: number, day: number, flagged = false, dismissed = false) => ({
   id,
   value,
   read_at: T0 + day * DAY,
   flagged,
+  dismissed,
 });
 
 const meter = (digits = 5) => ({ meter_id: c.int(1), rollover_digits: c.int(digits) });
@@ -27,7 +28,7 @@ export const flagReadings = defineFunction({
       table: readings,
       where: expr(col("meter_id"), "=", inp("meter_id")),
       sort: [{ sortBy: "read_at", dir: "asc" }],
-      output: ["id", "value", "read_at", "flagged"],
+      output: ["id", "value", "read_at", "flagged", "dismissed"],
       as: "history",
       mock: {
         "backwards reading is flagged": c.array([row(1, 100, 0), row(2, 120, 1), row(3, 110, 2), row(4, 130, 3)]),
@@ -41,6 +42,11 @@ export const flagReadings = defineFunction({
           row(6, 160, 5),
         ]),
         "flagged readings are skipped": c.array([row(1, 100, 0), row(2, 50, 1, true), row(3, 110, 2)]),
+        "dismissed reading is not flagged again": c.array([
+          row(1, 100, 0),
+          row(2, 50, 1, false, true),
+          row(3, 60, 2),
+        ]),
       },
     }),
     s.lambda({ code: lam.file("../lambdas/flag_readings.ts"), as: "flags" }),
@@ -73,6 +79,11 @@ export const flagReadings = defineFunction({
     },
     {
       name: "flagged readings are skipped",
+      input: meter(),
+      expect: [expect.to_be_empty(resp())],
+    },
+    {
+      name: "dismissed reading is not flagged again",
       input: meter(),
       expect: [expect.to_be_empty(resp())],
     },

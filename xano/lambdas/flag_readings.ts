@@ -4,12 +4,13 @@ export default function ({ $input, $var }: AmbientBindings) {
   const DAY = 86_400_000;
   const range = Math.pow(10, Number($input.rollover_digits));
   type Row = { id: number; value: number; read_at: number };
-  const rows: (Row & { flagged: boolean })[] = ($var.history ?? [])
-    .map((r: { id: number; value: number; read_at: number; flagged: boolean }) => ({
+  const rows: (Row & { flagged: boolean; dismissed: boolean })[] = ($var.history ?? [])
+    .map((r: { id: number; value: number; read_at: number; flagged: boolean; dismissed: boolean }) => ({
       id: Number(r.id),
       value: Number(r.value),
       read_at: Number(r.read_at),
       flagged: Boolean(r.flagged),
+      dismissed: Boolean(r.dismissed),
     }))
     .sort((a: Row, b: Row) => a.read_at - b.read_at);
 
@@ -19,7 +20,7 @@ export default function ({ $input, $var }: AmbientBindings) {
   for (const row of rows) {
     if (row.flagged) continue;
     const prev = clean[clean.length - 1];
-    if (!prev) {
+    if (!prev || row.dismissed) {
       clean.push(row);
       continue;
     }

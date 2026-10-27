@@ -58,7 +58,12 @@ export const XANO_HOST: string =
 import type { InferResponse } from "@xano/sdk";
 import type { signup, login } from "../../../xano/api/auth.js";
 import type { getMeter, listMeters } from "../../../xano/api/meters.js";
-import type { createReading, listReadings } from "../../../xano/api/readings.js";
+import type {
+  createReading,
+  dismissReading,
+  listFlaggedReadings,
+  listReadings,
+} from "../../../xano/api/readings.js";
 import type { createTariff, listTariffs, updateTariff } from "../../../xano/api/tariffs.js";
 import type { getUsage } from "../../../xano/api/usage.js";
 import type {
@@ -79,6 +84,8 @@ export type MeterRow = InferResponse<typeof getMeter>;
 export type CreateReadingBody = RouteInputs["POST create_reading"];
 export type Reading = InferResponse<typeof listReadings>[number];
 export type NewReading = InferResponse<typeof createReading>;
+export type FlaggedReading = InferResponse<typeof listFlaggedReadings>[number];
+export type DismissedReading = InferResponse<typeof dismissReading>;
 export type UsageQuery = Omit<RouteInputs["GET meters/{meter_id}/usage"], "meter_id">;
 export type Usage = InferResponse<typeof getUsage>;
 export type CreateTariffBody = RouteInputs["POST create_tariff"];
@@ -145,6 +152,17 @@ export const fetchReadings = (meterId: number) =>
   call<Reading[]>("GET meters/{meter_id}/readings", undefined, { meter_id: meterId });
 export const createReadingRequest = (body: CreateReadingBody) =>
   call<NewReading>("POST create_reading", body);
+export const fetchFlaggedReadings = () => call<FlaggedReading[]>("GET flagged_readings");
+export const dismissReadingRequest = (meterId: number, readingId: number) =>
+  call<DismissedReading>("POST meters/{meter_id}/readings/{reading_id}/dismiss", undefined, {
+    meter_id: meterId,
+    reading_id: readingId,
+  });
+export const deleteReadingRequest = (meterId: number, readingId: number) =>
+  call<unknown>("DELETE meters/{meter_id}/readings/{reading_id}", undefined, {
+    meter_id: meterId,
+    reading_id: readingId,
+  });
 export const fetchUsage = (meterId: number, query: UsageQuery) =>
   call<Usage>("GET meters/{meter_id}/usage", query, { meter_id: meterId });
 export const fetchTariffs = (meterId: number) =>

@@ -95,6 +95,7 @@ export const ROUTES = {
   "GET meters/{meter_id}": { verb: "GET", path: "/api:meters/meters/{meter_id}" },
   "POST create_reading": { verb: "POST", path: "/api:readings/create_reading" },
   "GET meters/{meter_id}/readings": { verb: "GET", path: "/api:readings/meters/{meter_id}/readings" },
+  "DELETE meters/{meter_id}/readings/{reading_id}": { verb: "DELETE", path: "/api:readings/meters/{meter_id}/readings/{reading_id}" },
   "POST create_tariff": { verb: "POST", path: "/api:tariffs/create_tariff" },
   "GET meters/{meter_id}/tariffs": { verb: "GET", path: "/api:tariffs/meters/{meter_id}/tariffs" },
   "DELETE tariffs/{tariff_id}": { verb: "DELETE", path: "/api:tariffs/tariffs/{tariff_id}" },
@@ -126,6 +127,7 @@ export function routePath(name: "GET list_meters"): string;
 export function routePath(name: "GET meters/{meter_id}", params: { "meter_id": string | number }): string;
 export function routePath(name: "POST create_reading"): string;
 export function routePath(name: "GET meters/{meter_id}/readings", params: { "meter_id": string | number }): string;
+export function routePath(name: "DELETE meters/{meter_id}/readings/{reading_id}", params: { "meter_id": string | number; "reading_id": string | number }): string;
 export function routePath(name: "POST create_tariff"): string;
 export function routePath(name: "GET meters/{meter_id}/tariffs", params: { "meter_id": string | number }): string;
 export function routePath(name: "DELETE tariffs/{tariff_id}", params: { "tariff_id": string | number }): string;
@@ -203,6 +205,10 @@ export type RouteInputs = {
   };
   "GET meters/{meter_id}/readings": {
     meter_id: number;
+  };
+  "DELETE meters/{meter_id}/readings/{reading_id}": {
+    meter_id: number;
+    reading_id: number;
   };
   "POST create_tariff": {
     meter_id: number;

@@ -97,11 +97,17 @@
     "query:readings|DELETE|meters/{meter_id}/readings/{reading_id}": {
       "guid": "a357fefbbeafb4c45d1344ad5172097d"
     },
+    "query:readings|GET|flagged_readings": {
+      "guid": "add4246758a367000341e9be904f8c6c"
+    },
     "query:readings|GET|meters/{meter_id}/readings": {
       "guid": "714834af19a57fd4daaed663dab8ee7b"
     },
     "query:readings|POST|create_reading": {
       "guid": "34acf2dcc9c36f64c11484951beebed5"
+    },
+    "query:readings|POST|meters/{meter_id}/readings/{reading_id}/dismiss": {
+      "guid": "4d8cfdba7b5e73a1415fec4cd2a17a9e"
     },
     "query:tariffs|DELETE|tariffs/{tariff_id}": {
       "guid": "ea93fd9dd995664606b5931b672e9bb7"

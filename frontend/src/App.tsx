@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { BillingPeriods } from "@/components/billing-periods";
 import { Dashboard } from "@/components/dashboard";
+import { FlaggedReadings } from "@/components/flagged-readings";
 import { AuthForm } from "@/components/auth-form";
 import { MeterDetail } from "@/components/meter-detail";
 import { ModeToggle } from "@/components/mode-toggle";
@@ -45,6 +46,8 @@ export default function App() {
             setExpired(false);
           }}
         />
+      ) : route.page === "flagged" ? (
+        <FlaggedReadings />
       ) : route.page === "meter" ? (
         <MeterDetail key={route.id} id={route.id} />
       ) : route.page === "tariffs" ? (

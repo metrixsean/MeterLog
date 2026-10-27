@@ -40,6 +40,7 @@ export const readings = table({
     entered_by: f.tableRef(users),
     flagged: f.bool(),
     flag_reason: f.text(),
+    dismissed: f.bool(),
   },
   index: [{ type: "btree", fields: [{ name: "meter_id" }, { name: "read_at" }] }],
 });

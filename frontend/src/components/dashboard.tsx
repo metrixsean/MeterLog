@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { TriangleAlert } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -54,9 +55,17 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Meters</h1>
-        <Button variant="outline" onClick={logout}>
-          Log out
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" asChild>
+            <a href="#/flagged">
+              <TriangleAlert />
+              Flagged
+            </a>
+          </Button>
+          <Button variant="outline" onClick={logout}>
+            Log out
+          </Button>
+        </div>
       </div>
       {error && <p className="text-destructive text-sm">{error}</p>}
       <div className="grid gap-4 sm:grid-cols-2">

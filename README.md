@@ -9,8 +9,9 @@ Built so far: signup (creates a household), login, an invite endpoint, meters, r
 and daily usage with a cost estimate from the active tariff. The dashboard shows each
 meter's last reading and this month's usage; a meter's page charts daily usage and lists
 its readings, and links to an editor for its tariffs and a list of its bills, each
-compared with the cost estimated for the same dates. The invite page and a review page for
-flagged readings are not written yet.
+compared with the cost estimated for the same dates. Flagged readings across the household
+are reviewed on one page: keep one (it is not flagged again) or delete it. The invite page
+is not written yet.
 
 The backend is TypeScript in [`xano/`](xano/), authored with the
 [Xano SDK](https://github.com/xano-sdk/sdk) and run on the Xano Engine. The frontend is

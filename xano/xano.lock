@@ -94,6 +94,9 @@
     "query:meters|POST|create_meter": {
       "guid": "5250e9e40e24996dff0fe4ee3e3e2edd"
     },
+    "query:readings|DELETE|meters/{meter_id}/readings/{reading_id}": {
+      "guid": "a357fefbbeafb4c45d1344ad5172097d"
+    },
     "query:readings|GET|meters/{meter_id}/readings": {
       "guid": "714834af19a57fd4daaed663dab8ee7b"
     },

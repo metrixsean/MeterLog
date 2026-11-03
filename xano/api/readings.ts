@@ -23,6 +23,9 @@ export const listReadings = query({
   response: ref("rows"),
 });
 
+const ownMeter: MeterGuardMock = { me: { id: 1, household_id: 1 }, meter: { id: 3, household_id: 1, rollover_digits: 5 } };
+const newReading = { meter_id: c.int(3), value: c.decimal(1200), read_at: c.int(1767225600000) };
+
 export const createReading = query({
   name: "create_reading",
   verb: "POST",
@@ -34,7 +37,11 @@ export const createReading = query({
     read_at: input.timestamp({ required: true }),
   },
   stack: [
-    ...meterGuard,
+    ...mockedMeterGuard({
+      "adds reading": ownMeter,
+      "keeps flag from check": ownMeter,
+      "other household is not found": { ...ownMeter, meter: { id: 3, household_id: 2 } },
+    }),
     s.function.run({
       fn: checkReading,
       input: {
@@ -44,6 +51,10 @@ export const createReading = query({
         read_at: inp("read_at"),
       },
       as: "check",
+      mock: {
+        "adds reading": c.obj({ flagged: false, flag_reason: null }),
+        "keeps flag from check": c.obj({ flagged: true, flag_reason: "went backwards" }),
+      },
     }),
     s.db.add({
       table: readings,
@@ -56,9 +67,30 @@ export const createReading = query({
         flag_reason: ref("check.flag_reason"),
       },
       as: "reading",
+      mock: {
+        "adds reading": c.obj({ id: 9, meter_id: 3, value: 1200, flagged: false, flag_reason: null }),
+        "keeps flag from check": c.obj({ id: 9, meter_id: 3, value: 1100, flagged: true, flag_reason: "went backwards" }),
+      },
     }),
   ],
   response: ref("reading"),
+  tests: [
+    {
+      name: "adds reading",
+      input: newReading,
+      expect: [expect.to_equal(resp("id"), c.int(9)), expect.to_equal(resp("flagged"), c.bool(false))],
+    },
+    {
+      name: "keeps flag from check",
+      input: newReading,
+      expect: [expect.to_equal(resp("flagged"), c.bool(true))],
+    },
+    {
+      name: "other household is not found",
+      input: newReading,
+      expect: [expect.to_throw(c.text("Meter not found."))],
+    },
+  ],
 });
 
 export const listFlaggedReadings = query({

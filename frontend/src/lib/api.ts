@@ -56,7 +56,8 @@ export const XANO_HOST: string =
   "";
 
 import type { InferResponse } from "@xano/sdk";
-import type { signup, login } from "../../../xano/api/auth.js";
+import type { signup, login, invite } from "../../../xano/api/auth.js";
+import type { getHousehold, removeMember, renameHousehold } from "../../../xano/api/household.js";
 import type { getMeter, listMeters } from "../../../xano/api/meters.js";
 import type {
   createReading,
@@ -78,6 +79,13 @@ export type SignupBody = RouteInputs["POST signup"];
 export type LoginBody = RouteInputs["POST login"];
 export type CreateMeterBody = RouteInputs["POST create_meter"];
 export type Session = InferResponse<typeof login>;
+export type InviteBody = RouteInputs["POST invite"];
+export type InvitedMember = InferResponse<typeof invite>;
+export type RenameHouseholdBody = RouteInputs["PATCH household"];
+export type Household = InferResponse<typeof getHousehold>;
+export type Member = Household["members"][number];
+export type RenamedHousehold = InferResponse<typeof renameHousehold>;
+export type RemovedMember = InferResponse<typeof removeMember>;
 export type SignupSession = InferResponse<typeof signup>;
 export type Meter = InferResponse<typeof listMeters>[number];
 export type MeterRow = InferResponse<typeof getMeter>;
@@ -144,6 +152,12 @@ async function call<T>(
 
 export const signupRequest = (body: SignupBody) => call<SignupSession>("POST signup", body);
 export const loginRequest = (body: LoginBody) => call<Session>("POST login", body);
+export const fetchHousehold = () => call<Household>("GET household");
+export const renameHouseholdRequest = (body: RenameHouseholdBody) =>
+  call<RenamedHousehold>("PATCH household", body);
+export const inviteRequest = (body: InviteBody) => call<InvitedMember>("POST invite", body);
+export const removeMemberRequest = (userId: number) =>
+  call<RemovedMember>("DELETE household/members/{user_id}", undefined, { user_id: userId });
 export const fetchMeters = () => call<Meter[]>("GET list_meters");
 export const createMeter = (body: CreateMeterBody) => call<Meter>("POST create_meter", body);
 export const fetchMeter = (meterId: number) =>

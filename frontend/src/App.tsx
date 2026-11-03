@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { BillingPeriods } from "@/components/billing-periods";
 import { Dashboard } from "@/components/dashboard";
 import { FlaggedReadings } from "@/components/flagged-readings";
+import { HouseholdSettings } from "@/components/household-settings";
 import { AuthForm } from "@/components/auth-form";
 import { MeterDetail } from "@/components/meter-detail";
 import { ModeToggle } from "@/components/mode-toggle";
@@ -48,6 +49,8 @@ export default function App() {
         />
       ) : route.page === "flagged" ? (
         <FlaggedReadings />
+      ) : route.page === "household" ? (
+        <HouseholdSettings />
       ) : route.page === "meter" ? (
         <MeterDetail key={route.id} id={route.id} />
       ) : route.page === "tariffs" ? (

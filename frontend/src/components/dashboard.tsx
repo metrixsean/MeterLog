@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { TriangleAlert } from "lucide-react";
+import { TriangleAlert, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -60,6 +60,12 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
             <a href="#/flagged">
               <TriangleAlert />
               Flagged
+            </a>
+          </Button>
+          <Button variant="outline" asChild>
+            <a href="#/household">
+              <Users />
+              Household
             </a>
           </Button>
           <Button variant="outline" onClick={logout}>

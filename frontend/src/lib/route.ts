@@ -3,12 +3,14 @@ import { useEffect, useState } from "react";
 export type Route =
   | { page: "dashboard" }
   | { page: "flagged" }
+  | { page: "household" }
   | { page: "meter"; id: number }
   | { page: "tariffs"; id: number }
   | { page: "billing"; id: number };
 
 function parse(hash: string): Route {
   if (hash === "#/flagged") return { page: "flagged" };
+  if (hash === "#/household") return { page: "household" };
   const m = /^#\/meters\/(\d+)(?:\/(tariffs|billing))?$/.exec(hash);
   if (!m) return { page: "dashboard" };
   const id = Number(m[1]);

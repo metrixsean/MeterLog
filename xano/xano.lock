@@ -11,6 +11,11 @@
       "canonical": "billing",
       "canonical_source": "code"
     },
+    "app:household": {
+      "guid": "3290830a6c79e70f6d802bd23fa8835b",
+      "canonical": "household",
+      "canonical_source": "code"
+    },
     "app:meters": {
       "guid": "45ec83951c2cfdb45ede21f8c09e27f2",
       "canonical": "meters",
@@ -84,6 +89,15 @@
     },
     "query:billing|POST|create_billing_period": {
       "guid": "544a88de303631412d0d6ad476ca25eb"
+    },
+    "query:household|DELETE|household/members/{user_id}": {
+      "guid": "fd6920fbdfc744b14fdf358ecc0eaef3"
+    },
+    "query:household|GET|household": {
+      "guid": "3d8783a2bc909e4a04228dff524a6430"
+    },
+    "query:household|PATCH|household": {
+      "guid": "ead7fd5529e83f6284587ade908cacb2"
     },
     "query:meters|GET|list_meters": {
       "guid": "a9e9dea6e3d198f6502feedd18ab8282"

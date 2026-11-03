@@ -90,6 +90,9 @@ export const ROUTES = {
   "GET billing_periods/{period_id}/summary": { verb: "GET", path: "/api:billing/billing_periods/{period_id}/summary" },
   "POST create_billing_period": { verb: "POST", path: "/api:billing/create_billing_period" },
   "GET meters/{meter_id}/billing_periods": { verb: "GET", path: "/api:billing/meters/{meter_id}/billing_periods" },
+  "GET household": { verb: "GET", path: "/api:household/household" },
+  "PATCH household": { verb: "PATCH", path: "/api:household/household" },
+  "DELETE household/members/{user_id}": { verb: "DELETE", path: "/api:household/household/members/{user_id}" },
   "POST create_meter": { verb: "POST", path: "/api:meters/create_meter" },
   "GET list_meters": { verb: "GET", path: "/api:meters/list_meters" },
   "GET meters/{meter_id}": { verb: "GET", path: "/api:meters/meters/{meter_id}" },
@@ -124,6 +127,9 @@ export function routePath(name: "PATCH billing_periods/{period_id}", params: { "
 export function routePath(name: "GET billing_periods/{period_id}/summary", params: { "period_id": string | number }): string;
 export function routePath(name: "POST create_billing_period"): string;
 export function routePath(name: "GET meters/{meter_id}/billing_periods", params: { "meter_id": string | number }): string;
+export function routePath(name: "GET household"): string;
+export function routePath(name: "PATCH household"): string;
+export function routePath(name: "DELETE household/members/{user_id}", params: { "user_id": string | number }): string;
 export function routePath(name: "POST create_meter"): string;
 export function routePath(name: "GET list_meters"): string;
 export function routePath(name: "GET meters/{meter_id}", params: { "meter_id": string | number }): string;
@@ -191,6 +197,13 @@ export type RouteInputs = {
   };
   "GET meters/{meter_id}/billing_periods": {
     meter_id: number;
+  };
+  "GET household": {};
+  "PATCH household": {
+    name: string;
+  };
+  "DELETE household/members/{user_id}": {
+    user_id: number;
   };
   "POST create_meter": {
     kind: "electric" | "gas" | "water";

@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { TriangleAlert } from "lucide-react";
+import { Trash2, TriangleAlert } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createReadingRequest, fetchReadings, type Meter, type Reading } from "@/lib/api";
+import { createReadingRequest, deleteReadingRequest, fetchReadings, type Meter, type Reading } from "@/lib/api";
 
 function localNow() {
   const d = new Date();
@@ -51,6 +51,19 @@ export function MeterReadings({ meter, onSaved }: { meter: Pick<Meter, "id" | "u
     }
   }
 
+  async function remove(reading: Reading) {
+    if (!window.confirm(`Delete the reading of ${reading.value} ${meter.unit}?`)) return;
+    setError(null);
+    setNotice(null);
+    try {
+      await deleteReadingRequest(meter.id, reading.id);
+      onSaved();
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Request failed");
+    }
+  }
+
   return (
     <div className="space-y-6">
       {error && <p className="text-destructive text-sm">{error}</p>}
@@ -83,6 +96,7 @@ export function MeterReadings({ meter, onSaved }: { meter: Pick<Meter, "id" | "u
             <th className="py-2 font-medium">Read at</th>
             <th className="py-2 text-right font-medium">Value</th>
             <th className="py-2 pl-4 font-medium">Status</th>
+            <th className="py-2" />
           </tr>
         </thead>
         <tbody>
@@ -97,6 +111,11 @@ export function MeterReadings({ meter, onSaved }: { meter: Pick<Meter, "id" | "u
                     {r.flag_reason}
                   </span>
                 )}
+              </td>
+              <td className="py-2 text-right">
+                <Button variant="ghost" size="icon" onClick={() => remove(r)} aria-label="Delete reading">
+                  <Trash2 />
+                </Button>
               </td>
             </tr>
           ))}

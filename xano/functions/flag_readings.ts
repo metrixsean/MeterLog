@@ -47,6 +47,16 @@ export const flagReadings = defineFunction({
           row(2, 50, 1, false, true),
           row(3, 60, 2),
         ]),
+        "dismissed drops do not skew the median": c.array([
+          row(1, 70, 0),
+          row(2, 80, 1),
+          row(3, 90, 2),
+          row(4, 100, 3),
+          row(5, 40, 4, false, true),
+          row(6, 30, 5, false, true),
+          row(7, 20, 6, false, true),
+          row(8, 70, 7),
+        ]),
       },
     }),
     s.lambda({ code: lam.file("../lambdas/flag_readings.ts"), as: "flags" }),
@@ -86,6 +96,15 @@ export const flagReadings = defineFunction({
       name: "dismissed reading is not flagged again",
       input: meter(),
       expect: [expect.to_be_empty(resp())],
+    },
+    {
+      name: "dismissed drops do not skew the median",
+      input: meter(),
+      expect: [
+        expect.to_equal(resp("0.id"), c.int(8)),
+        expect.to_equal(resp("0.flag_reason"), c.text("daily rate over 3x the 90-day median")),
+        expect.to_not_be_defined(resp("1")),
+      ],
     },
   ],
 });

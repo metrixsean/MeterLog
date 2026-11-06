@@ -14,7 +14,7 @@ export default function ({ $input, $var }: AmbientBindings) {
     }))
     .sort((a: Row, b: Row) => a.read_at - b.read_at);
 
-  const clean: Row[] = [];
+  const clean: (Row & { dismissed: boolean })[] = [];
   const flags: { id: number; flagged: boolean; flag_reason: string }[] = [];
 
   for (const row of rows) {
@@ -40,7 +40,7 @@ export default function ({ $input, $var }: AmbientBindings) {
     for (let i = 1; i < clean.length; i++) {
       const a = clean[i - 1];
       const b = clean[i];
-      if (b.read_at < row.read_at - 90 * DAY) continue;
+      if (b.dismissed || b.read_at < row.read_at - 90 * DAY) continue;
       const span = (b.read_at - a.read_at) / DAY;
       let delta = b.value - a.value;
       if (delta < 0) delta += range;

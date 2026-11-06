@@ -29,7 +29,7 @@ export const checkReading = defineFunction({
       ],
       sort: [{ sortBy: "read_at", dir: "desc" }],
       paging: { per_page: 200, metadata: false },
-      output: ["value", "read_at", "flagged"],
+      output: ["value", "read_at", "flagged", "dismissed"],
       as: "history",
       mock: {
         "drop below previous is flagged": c.array([{ value: 500, read_at: T0, flagged: false }]),
@@ -37,6 +37,10 @@ export const checkReading = defineFunction({
         "spike over 3x median is flagged": c.array(
           [3, 2, 1, 0].map((d) => ({ value: 100 - d * 10, read_at: T0 - d * DAY, flagged: false })),
         ),
+        "dismissed drops do not skew the median": c.array([
+          ...[3, 2, 1, 0].map((d) => ({ value: 100 - d * 10, read_at: T0 - (d + 3) * DAY, flagged: false, dismissed: false })),
+          ...[2, 1, 0].map((d) => ({ value: 20 + d * 10, read_at: T0 - d * DAY, flagged: false, dismissed: true })),
+        ]),
       },
     }),
     s.lambda({ code: lam.file("../lambdas/check_reading.ts"), as: "result" }),
@@ -67,6 +71,11 @@ export const checkReading = defineFunction({
     {
       name: "spike over 3x median is flagged",
       input: at(150, T0 + DAY),
+      expect: [expect.to_be_true(resp("flagged"))],
+    },
+    {
+      name: "dismissed drops do not skew the median",
+      input: at(70, T0 + DAY),
       expect: [expect.to_be_true(resp("flagged"))],
     },
   ],

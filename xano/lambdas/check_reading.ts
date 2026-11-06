@@ -5,9 +5,13 @@ export default function ({ $input, $var }: AmbientBindings) {
   const value = Number($input.value);
   const readAt = Number($input.read_at);
   const range = Math.pow(10, Number($input.rollover_digits));
-  const history: { value: number; read_at: number; flagged: boolean }[] = ($var.history ?? [])
+  const history: { value: number; read_at: number; dismissed: boolean }[] = ($var.history ?? [])
     .filter((r: { flagged: boolean }) => !r.flagged)
-    .map((r: { value: number; read_at: number }) => ({ value: Number(r.value), read_at: Number(r.read_at) }))
+    .map((r: { value: number; read_at: number; dismissed: boolean }) => ({
+      value: Number(r.value),
+      read_at: Number(r.read_at),
+      dismissed: Boolean(r.dismissed),
+    }))
     .sort((a: { read_at: number }, b: { read_at: number }) => a.read_at - b.read_at);
 
   const prev = history[history.length - 1];
@@ -30,7 +34,8 @@ export default function ({ $input, $var }: AmbientBindings) {
   for (let i = 1; i < history.length; i++) {
     const a = history[i - 1];
     const b = history[i];
-    if (b.read_at < readAt - 90 * DAY) continue;
+    // A dismissed reading starts a new baseline, so the gap before it is not a rate.
+    if (b.dismissed || b.read_at < readAt - 90 * DAY) continue;
     const span = (b.read_at - a.read_at) / DAY;
     let used = b.value - a.value;
     if (used < 0) used += range;

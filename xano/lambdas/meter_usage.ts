@@ -17,11 +17,12 @@ export default function ({ $input, $var }: AmbientBindings) {
     ? Math.min((end - start) / DAY + 1, MAX_DAYS)
     : 0;
 
-  const all: { value: number; read_at: number; flagged: boolean }[] = ($var.history ?? [])
-    .map((r: { value: unknown; read_at: unknown; flagged: unknown }) => ({
+  const all: { value: number; read_at: number; flagged: boolean; dismissed: boolean }[] = ($var.history ?? [])
+    .map((r: { value: unknown; read_at: unknown; flagged: unknown; dismissed: unknown }) => ({
       value: Number(r.value),
       read_at: Number(r.read_at),
       flagged: Boolean(r.flagged),
+      dismissed: Boolean(r.dismissed),
     }))
     .sort((a: { read_at: number }, b: { read_at: number }) => a.read_at - b.read_at);
   const good = all.filter((r) => !r.flagged);
@@ -33,7 +34,7 @@ export default function ({ $input, $var }: AmbientBindings) {
     const a = good[i - 1];
     const b = good[i];
     const span = b.read_at - a.read_at;
-    if (span <= 0) continue;
+    if (span <= 0 || b.dismissed) continue;
     let delta = b.value - a.value;
     if (delta < 0) delta += range;
     const perMs = delta / span;

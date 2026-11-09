@@ -20,7 +20,12 @@ const span = (from: string, to: string, digits = 5) => ({
   to: c.text(to),
 });
 
-const reading = (value: number, read_at: number, flagged = false) => ({ value, read_at, flagged });
+const reading = (value: number, read_at: number, flagged = false, dismissed = false) => ({
+  value,
+  read_at,
+  flagged,
+  dismissed,
+});
 
 export const meterUsage = defineFunction({
   name: "meter_usage",
@@ -35,7 +40,7 @@ export const meterUsage = defineFunction({
       table: readings,
       where: expr(col("meter_id"), "=", inp("meter_id")),
       sort: [{ sortBy: "read_at", dir: "asc" }],
-      output: ["value", "read_at", "flagged"],
+      output: ["value", "read_at", "flagged", "dismissed"],
       as: "history",
       mock: {
         "spreads usage across days": c.array([reading(100, JAN1), reading(120, JAN1 + 2 * DAY)]),
@@ -46,6 +51,11 @@ export const meterUsage = defineFunction({
           reading(110, JAN1 + 2 * DAY),
         ]),
         "no readings leaves usage empty": c.array([]),
+        "dismissed reading resets the baseline": c.array([
+          reading(100, JAN1),
+          reading(40, JAN1 + DAY, false, true),
+          reading(50, JAN1 + 2 * DAY),
+        ]),
       },
     }),
     s.db.query({
@@ -60,6 +70,7 @@ export const meterUsage = defineFunction({
         "handles rollover": c.array([]),
         "skips flagged readings": c.array([]),
         "no readings leaves usage empty": c.array([]),
+        "dismissed reading resets the baseline": c.array([]),
       },
     }),
     s.lambda({ code: lam.file("../lambdas/meter_usage.ts"), as: "result" }),
@@ -96,6 +107,14 @@ export const meterUsage = defineFunction({
         expect.to_be_null(resp("days.0.usage")),
         expect.to_be_null(resp("last_reading")),
         expect.to_be_null(resp("total_cost")),
+      ],
+    },
+    {
+      name: "dismissed reading resets the baseline",
+      input: span("2026-01-01", "2026-01-02"),
+      expect: [
+        expect.to_be_null(resp("days.0.usage")),
+        expect.to_equal(resp("total_usage"), c.decimal(10)),
       ],
     },
   ],

@@ -1,4 +1,4 @@
-import { apiGroup, query, input, s, ref, inp, c, expr, expect, resp, auth } from "@xano/sdk";
+import { apiGroup, query, input, s, ref, inp, c, expr, expect, resp, auth, guard } from "@xano/sdk";
 import { households, users } from "../tables.js";
 
 export const authApi = apiGroup({ name: "auth", canonical: "auth" });
@@ -124,6 +124,61 @@ export const invite = query({
       name: "rejects taken email",
       input: inviteInput,
       expect: [expect.to_throw(c.text("Email already registered."))],
+    },
+  ],
+});
+
+export const changePassword = query({
+  name: "change_password",
+  verb: "POST",
+  apiGroup: authApi,
+  auth: users,
+  input: {
+    current_password: input.text({ required: true, sensitive: true }),
+    new_password: input.text({ required: true, sensitive: true }),
+  },
+  stack: [
+    guard.require(expr(inp("new_password"), "!=", inp("current_password")), {
+      errorType: "badrequest",
+      message: "New password must differ from the current one.",
+    }),
+    s.db.get({
+      table: users,
+      fieldName: "id",
+      fieldValue: auth("id"),
+      output: ["id", "password"],
+      as: "me",
+      mock: { "rejects wrong current password": c.obj({ id: 1, password: "not-a-hash" }) },
+    }),
+    s.security.check_password({
+      text_password: inp("current_password"),
+      hash_password: ref("me.password"),
+      as: "ok",
+    }),
+    s.precondition({
+      expr: expr(ref("ok"), "=", c.bool(true)),
+      error_type: "unauthorized",
+      error: c.text("Current password is wrong."),
+    }),
+    s.db.edit({
+      table: users,
+      fieldValue: auth("id"),
+      row: { password: inp("new_password") },
+      output: ["id", "email"],
+      as: "user",
+    }),
+  ],
+  response: { id: ref("user.id"), email: ref("user.email") },
+  tests: [
+    {
+      name: "rejects wrong current password",
+      input: { current_password: c.text("wrong horse"), new_password: c.text("battery staple") },
+      expect: [expect.to_throw(c.text("Current password is wrong."))],
+    },
+    {
+      name: "rejects unchanged password",
+      input: { current_password: c.text("correct horse"), new_password: c.text("correct horse") },
+      expect: [expect.to_throw(c.text("New password must differ"))],
     },
   ],
 });

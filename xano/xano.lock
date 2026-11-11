@@ -66,6 +66,9 @@
     "function:period_summary": {
       "guid": "576bf8164c17953ada492766f67a10f7"
     },
+    "query:auth|POST|change_password": {
+      "guid": "4c59cfcbb7c6392931f60c2020efb89c"
+    },
     "query:auth|POST|invite": {
       "guid": "73e1a76b8acd473be9511f3f82048a99"
     },

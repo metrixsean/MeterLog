@@ -56,7 +56,7 @@ export const XANO_HOST: string =
   "";
 
 import type { InferResponse } from "@xano/sdk";
-import type { signup, login, invite } from "../../../xano/api/auth.js";
+import type { signup, login, invite, changePassword } from "../../../xano/api/auth.js";
 import type { getHousehold, removeMember, renameHousehold } from "../../../xano/api/household.js";
 import type { getMeter, listMeters } from "../../../xano/api/meters.js";
 import type {
@@ -81,6 +81,8 @@ export type CreateMeterBody = RouteInputs["POST create_meter"];
 export type Session = InferResponse<typeof login>;
 export type InviteBody = RouteInputs["POST invite"];
 export type InvitedMember = InferResponse<typeof invite>;
+export type ChangePasswordBody = RouteInputs["POST change_password"];
+export type ChangedPassword = InferResponse<typeof changePassword>;
 export type RenameHouseholdBody = RouteInputs["PATCH household"];
 export type Household = InferResponse<typeof getHousehold>;
 export type Member = Household["members"][number];
@@ -156,6 +158,8 @@ export const fetchHousehold = () => call<Household>("GET household");
 export const renameHouseholdRequest = (body: RenameHouseholdBody) =>
   call<RenamedHousehold>("PATCH household", body);
 export const inviteRequest = (body: InviteBody) => call<InvitedMember>("POST invite", body);
+export const changePasswordRequest = (body: ChangePasswordBody) =>
+  call<ChangedPassword>("POST change_password", body);
 export const removeMemberRequest = (userId: number) =>
   call<RemovedMember>("DELETE household/members/{user_id}", undefined, { user_id: userId });
 export const fetchMeters = () => call<Meter[]>("GET list_meters");

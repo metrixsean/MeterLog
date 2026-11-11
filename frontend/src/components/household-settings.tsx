@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { ArrowLeft, Trash2, UserPlus } from "lucide-react";
+import { ArrowLeft, KeyRound, Trash2, UserPlus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  changePasswordRequest,
   fetchHousehold,
   inviteRequest,
   removeMemberRequest,
@@ -70,6 +71,23 @@ export function HouseholdSettings() {
       form.reset();
       setNotice(`${added.email} can now log in with the password you set.`);
       await load();
+    });
+  }
+
+  function changePassword(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    const next = String(data.get("new_password"));
+    if (next !== String(data.get("confirm_password"))) {
+      setNotice(null);
+      setError("The new passwords do not match.");
+      return;
+    }
+    void run(async () => {
+      await changePasswordRequest({ current_password: String(data.get("current_password")), new_password: next });
+      form.reset();
+      setNotice("Password changed.");
     });
   }
 
@@ -146,7 +164,7 @@ export function HouseholdSettings() {
           <Card>
             <CardHeader>
               <CardTitle>Invite a member</CardTitle>
-              <CardDescription>Set a password for them and pass it on. They log in with their own email.</CardDescription>
+              <CardDescription>Set a password for them and pass it on. They can change it here after logging in.</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={invite} className="grid gap-4 sm:grid-cols-2">
@@ -162,6 +180,45 @@ export function HouseholdSettings() {
                   <Button type="submit" disabled={busy}>
                     <UserPlus />
                     Invite
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Your password</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={changePassword} className="grid gap-4 sm:grid-cols-3">
+                <div className="space-y-2">
+                  <Label htmlFor="current_password">Current password</Label>
+                  <Input
+                    id="current_password"
+                    name="current_password"
+                    type="password"
+                    autoComplete="current-password"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="new_password">New password</Label>
+                  <Input id="new_password" name="new_password" type="password" autoComplete="new-password" required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirm_password">Confirm new password</Label>
+                  <Input
+                    id="confirm_password"
+                    name="confirm_password"
+                    type="password"
+                    autoComplete="new-password"
+                    required
+                  />
+                </div>
+                <div className="sm:col-span-3">
+                  <Button type="submit" variant="outline" disabled={busy}>
+                    <KeyRound />
+                    Change password
                   </Button>
                 </div>
               </form>

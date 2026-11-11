@@ -12,7 +12,7 @@ its readings, and links to an editor for its tariffs and a list of its bills, ea
 compared with the cost estimated for the same dates. Flagged readings across the household
 are reviewed on one page: keep one (it is not flagged again) or delete it. The household
 page renames the household, lists its members, invites a new one with a password you pass
-on, and removes one.
+on, and removes one; each member changes their own password there.
 
 The backend is TypeScript in [`xano/`](xano/), authored with the
 [Xano SDK](https://github.com/xano-sdk/sdk) and run on the Xano Engine. The frontend is

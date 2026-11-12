@@ -98,10 +98,6 @@ export const removeMember = query({
   auth: users,
   input: { user_id: input.int({ required: true }) },
   stack: [
-    guard.require(expr(inp("user_id"), "!=", auth("id")), {
-      errorType: "badrequest",
-      message: "You cannot remove yourself.",
-    }),
     s.db.get({
       table: users,
       fieldName: "id",
@@ -110,7 +106,12 @@ export const removeMember = query({
       mock: {
         "removes member of own household": c.obj(ME),
         "other household is not found": c.obj(ME),
+        "cannot remove yourself": c.obj(ME),
       },
+    }),
+    guard.require(expr(inp("user_id"), "!=", ref("me.id")), {
+      errorType: "badrequest",
+      message: "You cannot remove yourself.",
     }),
     s.db.get({
       table: users,
@@ -141,6 +142,11 @@ export const removeMember = query({
       name: "other household is not found",
       input: { user_id: c.int(2) },
       expect: [expect.to_throw(c.text("Member not found."))],
+    },
+    {
+      name: "cannot remove yourself",
+      input: { user_id: c.int(1) },
+      expect: [expect.to_throw(c.text("You cannot remove yourself."))],
     },
   ],
 });

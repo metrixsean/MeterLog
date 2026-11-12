@@ -1,5 +1,5 @@
-import { apiGroup, query, input, s, ref, inp, auth, c, col, expr, guard, expect, resp } from "@xano/sdk";
-import { households, users } from "../tables.js";
+import { apiGroup, query, input, s, ref, inp, auth, c, col, expr, guard, expect, resp, obj } from "@xano/sdk";
+import { households, readings, users } from "../tables.js";
 
 export const householdApi = apiGroup({ name: "household", canonical: "household" });
 
@@ -128,6 +128,18 @@ export const removeMember = query({
     guard.require(expr(ref("member.household_id"), "=", ref("me.household_id")), {
       errorType: "notfound",
       message: "Member not found.",
+    }),
+    s.db.query({
+      table: readings,
+      where: expr(col("entered_by"), "=", inp("user_id")),
+      output: ["id"],
+      as: "entered",
+      mock: { "removes member of own household": c.array([]) },
+    }),
+    s.foreach({
+      list: ref("entered"),
+      as: "reading",
+      body: [s.db.patch({ table: readings, fieldValue: ref("reading.id"), data: obj({ entered_by: c.null() }) })],
     }),
     s.db.del({ table: users, fieldValue: inp("user_id"), mock: { "removes member of own household": c.null() } }),
   ],

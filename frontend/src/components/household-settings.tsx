@@ -174,7 +174,14 @@ export function HouseholdSettings() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="invite_password">Password</Label>
-                  <Input id="invite_password" name="password" type="password" autoComplete="new-password" required />
+                  <Input
+                    id="invite_password"
+                    name="password"
+                    type="password"
+                    autoComplete="new-password"
+                    minLength={8}
+                    required
+                  />
                 </div>
                 <div className="sm:col-span-2">
                   <Button type="submit" disabled={busy}>
@@ -203,7 +210,14 @@ export function HouseholdSettings() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="new_password">New password</Label>
-                  <Input id="new_password" name="new_password" type="password" autoComplete="new-password" required />
+                  <Input
+                    id="new_password"
+                    name="new_password"
+                    type="password"
+                    autoComplete="new-password"
+                    minLength={8}
+                    required
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="confirm_password">Confirm new password</Label>

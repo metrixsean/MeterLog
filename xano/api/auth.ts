@@ -1,7 +1,18 @@
-import { apiGroup, query, input, s, ref, inp, c, expr, expect, resp, auth, guard } from "@xano/sdk";
+import { apiGroup, query, input, s, ref, inp, c, expr, expect, resp, auth, guard, fl, statements } from "@xano/sdk";
 import { households, users } from "../tables.js";
 
 export const authApi = apiGroup({ name: "auth", canonical: "auth" });
+
+const MIN_PASSWORD = 8;
+
+const passwordLength = (name: string) =>
+  statements(
+    s.set_var("password_length", inp(name), { asFilters: [fl.strlen()] }),
+    guard.require(expr(ref("password_length"), ">=", c.int(MIN_PASSWORD)), {
+      errorType: "badrequest",
+      message: `Password must be at least ${MIN_PASSWORD} characters.`,
+    }),
+  );
 
 export const signup = query({
   name: "signup",
@@ -13,6 +24,7 @@ export const signup = query({
     household_name: input.text({ required: true }),
   },
   stack: [
+    ...passwordLength("password"),
     s.db.has({ table: users, fieldName: "email", fieldValue: inp("email"), as: "taken" }),
     s.precondition({
       expr: expr(ref("taken"), "=", c.bool(false)),
@@ -37,6 +49,11 @@ export const signup = query({
         household_name: c.text("Flat 1"),
       },
       expect: [expect.to_be_defined(resp("token"))],
+    },
+    {
+      name: "rejects short password",
+      input: { email: c.text("a@example.com"), password: c.text("short"), household_name: c.text("Flat 1") },
+      expect: [expect.to_throw(c.text("at least 8 characters"))],
     },
   ],
 });
@@ -93,6 +110,7 @@ export const invite = query({
     password: input.text({ required: true, sensitive: true }),
   },
   stack: [
+    ...passwordLength("password"),
     s.db.get({ table: users, fieldName: "id", fieldValue: auth("id"), as: "me", mock: inviteMe }),
     s.db.has({
       table: users,
@@ -125,6 +143,11 @@ export const invite = query({
       input: inviteInput,
       expect: [expect.to_throw(c.text("Email already registered."))],
     },
+    {
+      name: "rejects short invite password",
+      input: { email: c.text("b@example.com"), password: c.text("short") },
+      expect: [expect.to_throw(c.text("at least 8 characters"))],
+    },
   ],
 });
 
@@ -138,6 +161,7 @@ export const changePassword = query({
     new_password: input.text({ required: true, sensitive: true }),
   },
   stack: [
+    ...passwordLength("new_password"),
     guard.require(expr(inp("new_password"), "!=", inp("current_password")), {
       errorType: "badrequest",
       message: "New password must differ from the current one.",
@@ -179,6 +203,11 @@ export const changePassword = query({
       name: "rejects unchanged password",
       input: { current_password: c.text("correct horse"), new_password: c.text("correct horse") },
       expect: [expect.to_throw(c.text("New password must differ"))],
+    },
+    {
+      name: "rejects short new password",
+      input: { current_password: c.text("correct horse"), new_password: c.text("short") },
+      expect: [expect.to_throw(c.text("at least 8 characters"))],
     },
   ],
 });

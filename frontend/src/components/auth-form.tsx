@@ -53,7 +53,14 @@ export function AuthForm({ expired, onDone }: { expired?: boolean; onDone: () =>
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" name="password" type="password" required />
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              autoComplete={signingUp ? "new-password" : "current-password"}
+              minLength={signingUp ? 8 : undefined}
+              required
+            />
           </div>
           {error && <p className="text-destructive text-sm">{error}</p>}
           <div className="flex items-center gap-2">

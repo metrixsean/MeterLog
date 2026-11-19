@@ -1,11 +1,20 @@
-import { useEffect, useState } from "react";
-import { ArrowLeft, FileText, Receipt } from "lucide-react";
+import { useEffect, useState, type FormEvent } from "react";
+import { ArrowLeft, FileText, Pencil, Receipt, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { MeterReadings } from "@/components/meter-readings";
 import { UsageChart } from "@/components/usage-chart";
-import { fetchMeter, fetchUsage, type MeterRow, type Usage } from "@/lib/api";
+import {
+  deleteMeterRequest,
+  fetchMeter,
+  fetchUsage,
+  updateMeterRequest,
+  type MeterRow,
+  type Usage,
+} from "@/lib/api";
 import { daysAgo, formatAmount, formatMoney } from "@/lib/format";
 import { navigate } from "@/lib/route";
 
@@ -16,6 +25,7 @@ export function MeterDetail({ id }: { id: number }) {
   const [usage, setUsage] = useState<Usage | null>(null);
   const [range, setRange] = useState<(typeof RANGES)[number]>(30);
   const [version, setVersion] = useState(0);
+  const [editing, setEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -37,6 +47,37 @@ export function MeterDetail({ id }: { id: number }) {
       live = false;
     };
   }, [id, range, version]);
+
+  async function save(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const data = new FormData(e.currentTarget);
+    const serial = String(data.get("serial"));
+    setError(null);
+    try {
+      const updated = await updateMeterRequest(id, {
+        unit: String(data.get("unit")),
+        rollover_digits: Number(data.get("rollover_digits")),
+        ...(serial && { serial }),
+      });
+      setMeter(updated);
+      setEditing(false);
+      setVersion((v) => v + 1);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Request failed");
+    }
+  }
+
+  async function remove() {
+    if (!meter) return;
+    if (!window.confirm(`Delete this ${meter.kind} meter with all its readings, tariffs and bills?`)) return;
+    setError(null);
+    try {
+      await deleteMeterRequest(id);
+      navigate("/");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Request failed");
+    }
+  }
 
   const back = (
     <Button variant="outline" size="icon" onClick={() => navigate("/")} aria-label="Back to meters">
@@ -75,9 +116,52 @@ export function MeterDetail({ id }: { id: number }) {
             <FileText />
             Bills
           </Button>
+          <Button variant="outline" size="icon" onClick={() => setEditing((v) => !v)} aria-label="Edit meter">
+            <Pencil />
+          </Button>
+          <Button variant="outline" size="icon" onClick={remove} aria-label="Delete meter">
+            <Trash2 />
+          </Button>
         </div>
       </div>
       {error && <p className="text-destructive text-sm">{error}</p>}
+      {editing && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Edit meter</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={save} className="grid gap-4 sm:grid-cols-3">
+              <div className="space-y-2">
+                <Label htmlFor="unit">Unit</Label>
+                <Input id="unit" name="unit" defaultValue={meter.unit} required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="serial">Serial</Label>
+                <Input id="serial" name="serial" defaultValue={meter.serial ?? ""} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="rollover_digits">Dial digits</Label>
+                <Input
+                  id="rollover_digits"
+                  name="rollover_digits"
+                  type="number"
+                  min={1}
+                  max={12}
+                  defaultValue={meter.rollover_digits}
+                  required
+                />
+              </div>
+              <div className="flex gap-2 sm:col-span-3">
+                <Button type="submit">Save</Button>
+                <Button type="button" variant="outline" onClick={() => setEditing(false)}>
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
       <Card>
         <CardHeader className="flex flex-row items-start justify-between gap-4">
           <div className="space-y-1.5">

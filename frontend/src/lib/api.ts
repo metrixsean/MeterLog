@@ -58,7 +58,7 @@ export const XANO_HOST: string =
 import type { InferResponse } from "@xano/sdk";
 import type { signup, login, invite, changePassword } from "../../../xano/api/auth.js";
 import type { getHousehold, removeMember, renameHousehold } from "../../../xano/api/household.js";
-import type { getMeter, listMeters } from "../../../xano/api/meters.js";
+import type { getMeter, listMeters, updateMeter } from "../../../xano/api/meters.js";
 import type {
   createReading,
   dismissReading,
@@ -91,6 +91,8 @@ export type RemovedMember = InferResponse<typeof removeMember>;
 export type SignupSession = InferResponse<typeof signup>;
 export type Meter = InferResponse<typeof listMeters>[number];
 export type MeterRow = InferResponse<typeof getMeter>;
+export type UpdateMeterBody = Omit<RouteInputs["PATCH meters/{meter_id}"], "meter_id">;
+export type UpdatedMeter = InferResponse<typeof updateMeter>;
 export type CreateReadingBody = RouteInputs["POST create_reading"];
 export type Reading = InferResponse<typeof listReadings>[number];
 export type NewReading = InferResponse<typeof createReading>;
@@ -166,6 +168,10 @@ export const fetchMeters = () => call<Meter[]>("GET list_meters");
 export const createMeter = (body: CreateMeterBody) => call<Meter>("POST create_meter", body);
 export const fetchMeter = (meterId: number) =>
   call<MeterRow>("GET meters/{meter_id}", undefined, { meter_id: meterId });
+export const updateMeterRequest = (meterId: number, body: UpdateMeterBody) =>
+  call<UpdatedMeter>("PATCH meters/{meter_id}", body, { meter_id: meterId });
+export const deleteMeterRequest = (meterId: number) =>
+  call<unknown>("DELETE meters/{meter_id}", undefined, { meter_id: meterId });
 export const fetchReadings = (meterId: number) =>
   call<Reading[]>("GET meters/{meter_id}/readings", undefined, { meter_id: meterId });
 export const createReadingRequest = (body: CreateReadingBody) =>

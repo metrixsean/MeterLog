@@ -102,11 +102,17 @@
     "query:household|PATCH|household": {
       "guid": "ead7fd5529e83f6284587ade908cacb2"
     },
+    "query:meters|DELETE|meters/{meter_id}": {
+      "guid": "856fbc4d438fe56420637aec685c91c2"
+    },
     "query:meters|GET|list_meters": {
       "guid": "a9e9dea6e3d198f6502feedd18ab8282"
     },
     "query:meters|GET|meters/{meter_id}": {
       "guid": "097ffbaa130ce52b6cd30cdf6ec9ff19"
+    },
+    "query:meters|PATCH|meters/{meter_id}": {
+      "guid": "cd4ffb78546347512444689e0fef29dc"
     },
     "query:meters|POST|create_meter": {
       "guid": "5250e9e40e24996dff0fe4ee3e3e2edd"

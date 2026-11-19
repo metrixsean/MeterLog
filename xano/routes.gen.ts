@@ -96,7 +96,9 @@ export const ROUTES = {
   "DELETE household/members/{user_id}": { verb: "DELETE", path: "/api:household/household/members/{user_id}" },
   "POST create_meter": { verb: "POST", path: "/api:meters/create_meter" },
   "GET list_meters": { verb: "GET", path: "/api:meters/list_meters" },
+  "DELETE meters/{meter_id}": { verb: "DELETE", path: "/api:meters/meters/{meter_id}" },
   "GET meters/{meter_id}": { verb: "GET", path: "/api:meters/meters/{meter_id}" },
+  "PATCH meters/{meter_id}": { verb: "PATCH", path: "/api:meters/meters/{meter_id}" },
   "POST create_reading": { verb: "POST", path: "/api:readings/create_reading" },
   "GET flagged_readings": { verb: "GET", path: "/api:readings/flagged_readings" },
   "GET meters/{meter_id}/readings": { verb: "GET", path: "/api:readings/meters/{meter_id}/readings" },
@@ -134,7 +136,9 @@ export function routePath(name: "PATCH household"): string;
 export function routePath(name: "DELETE household/members/{user_id}", params: { "user_id": string | number }): string;
 export function routePath(name: "POST create_meter"): string;
 export function routePath(name: "GET list_meters"): string;
+export function routePath(name: "DELETE meters/{meter_id}", params: { "meter_id": string | number }): string;
 export function routePath(name: "GET meters/{meter_id}", params: { "meter_id": string | number }): string;
+export function routePath(name: "PATCH meters/{meter_id}", params: { "meter_id": string | number }): string;
 export function routePath(name: "POST create_reading"): string;
 export function routePath(name: "GET flagged_readings"): string;
 export function routePath(name: "GET meters/{meter_id}/readings", params: { "meter_id": string | number }): string;
@@ -218,8 +222,17 @@ export type RouteInputs = {
     rollover_digits: number;
   };
   "GET list_meters": {};
+  "DELETE meters/{meter_id}": {
+    meter_id: number;
+  };
   "GET meters/{meter_id}": {
     meter_id: number;
+  };
+  "PATCH meters/{meter_id}": {
+    meter_id: number;
+    unit: string;
+    serial?: string;
+    rollover_digits: number;
   };
   "POST create_reading": {
     meter_id: number;

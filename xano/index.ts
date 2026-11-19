@@ -2,7 +2,7 @@ import { workspace } from "@xano/sdk";
 import { households, users, meters, readings, tariffs, billingPeriods } from "./tables.js";
 import { authApi, signup, login, invite, changePassword } from "./api/auth.js";
 import { householdApi, getHousehold, renameHousehold, removeMember } from "./api/household.js";
-import { metersApi, listMeters, createMeter, getMeter } from "./api/meters.js";
+import { metersApi, listMeters, createMeter, getMeter, updateMeter, deleteMeter } from "./api/meters.js";
 import { readingsApi, listReadings, createReading, listFlaggedReadings, dismissReading, deleteReading } from "./api/readings.js";
 import { tariffsApi, listTariffs, createTariff, updateTariff, deleteTariff } from "./api/tariffs.js";
 import { usageApi, getUsage } from "./api/usage.js";
@@ -28,7 +28,7 @@ export default workspace("meterlog")
   .registerQueries([
     signup, login, invite, changePassword,
     getHousehold, renameHousehold, removeMember,
-    listMeters, createMeter, getMeter,
+    listMeters, createMeter, getMeter, updateMeter, deleteMeter,
     listReadings, createReading, listFlaggedReadings, dismissReading, deleteReading,
     listTariffs, createTariff, updateTariff, deleteTariff,
     getUsage,

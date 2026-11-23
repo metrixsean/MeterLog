@@ -64,6 +64,7 @@ import type {
   dismissReading,
   listFlaggedReadings,
   listReadings,
+  updateReading,
 } from "../../../xano/api/readings.js";
 import type { createTariff, listTariffs, updateTariff } from "../../../xano/api/tariffs.js";
 import type { getUsage } from "../../../xano/api/usage.js";
@@ -98,6 +99,8 @@ export type Reading = InferResponse<typeof listReadings>[number];
 export type NewReading = InferResponse<typeof createReading>;
 export type FlaggedReading = InferResponse<typeof listFlaggedReadings>[number];
 export type DismissedReading = InferResponse<typeof dismissReading>;
+export type UpdateReadingBody = Omit<RouteInputs["PATCH meters/{meter_id}/readings/{reading_id}"], "meter_id" | "reading_id">;
+export type UpdatedReading = InferResponse<typeof updateReading>;
 export type UsageQuery = Omit<RouteInputs["GET meters/{meter_id}/usage"], "meter_id">;
 export type Usage = InferResponse<typeof getUsage>;
 export type CreateTariffBody = RouteInputs["POST create_tariff"];
@@ -179,6 +182,11 @@ export const createReadingRequest = (body: CreateReadingBody) =>
 export const fetchFlaggedReadings = () => call<FlaggedReading[]>("GET flagged_readings");
 export const dismissReadingRequest = (meterId: number, readingId: number) =>
   call<DismissedReading>("POST meters/{meter_id}/readings/{reading_id}/dismiss", undefined, {
+    meter_id: meterId,
+    reading_id: readingId,
+  });
+export const updateReadingRequest = (meterId: number, readingId: number, body: UpdateReadingBody) =>
+  call<UpdatedReading>("PATCH meters/{meter_id}/readings/{reading_id}", body, {
     meter_id: meterId,
     reading_id: readingId,
   });

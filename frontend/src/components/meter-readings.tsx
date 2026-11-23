@@ -1,14 +1,21 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { Trash2, TriangleAlert } from "lucide-react";
+import { Check, Pencil, Trash2, TriangleAlert, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createReadingRequest, deleteReadingRequest, fetchReadings, type Meter, type Reading } from "@/lib/api";
+import {
+  createReadingRequest,
+  deleteReadingRequest,
+  fetchReadings,
+  updateReadingRequest,
+  type Meter,
+  type Reading,
+} from "@/lib/api";
 
-function localNow() {
-  const d = new Date();
+function toLocalInput(ms: number) {
+  const d = new Date(ms);
   d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
   return d.toISOString().slice(0, 16);
 }
@@ -17,6 +24,7 @@ export function MeterReadings({ meter, onSaved }: { meter: Pick<Meter, "id" | "u
   const [readings, setReadings] = useState<Reading[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [editing, setEditing] = useState<{ id: number; value: string; read_at: string } | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -44,6 +52,25 @@ export function MeterReadings({ meter, onSaved }: { meter: Pick<Meter, "id" | "u
       });
       if (reading.flagged) setNotice(`Saved, but flagged: ${reading.flag_reason}`);
       form.reset();
+      onSaved();
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Request failed");
+    }
+  }
+
+  async function save(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!editing) return;
+    setError(null);
+    setNotice(null);
+    try {
+      const reading = await updateReadingRequest(meter.id, editing.id, {
+        value: Number(editing.value),
+        read_at: new Date(editing.read_at).getTime(),
+      });
+      if (reading.flagged) setNotice(`Saved, but flagged: ${reading.flag_reason}`);
+      setEditing(null);
       onSaved();
       await load();
     } catch (err) {
@@ -81,7 +108,13 @@ export function MeterReadings({ meter, onSaved }: { meter: Pick<Meter, "id" | "u
             </div>
             <div className="space-y-2">
               <Label htmlFor="read_at">Read at</Label>
-              <Input id="read_at" name="read_at" type="datetime-local" defaultValue={localNow()} required />
+              <Input
+                id="read_at"
+                name="read_at"
+                type="datetime-local"
+                defaultValue={toLocalInput(Date.now())}
+                required
+              />
             </div>
             <div className="sm:col-span-2">
               <Button type="submit">Save reading</Button>
@@ -100,27 +133,75 @@ export function MeterReadings({ meter, onSaved }: { meter: Pick<Meter, "id" | "u
           </tr>
         </thead>
         <tbody>
-          {readings.map((r) => (
-            <tr key={r.id} className="border-t">
-              <td className="py-2">{r.read_at ? new Date(r.read_at).toLocaleString() : ""}</td>
-              <td className="py-2 text-right tabular-nums">{r.value}</td>
-              <td className="py-2 pl-4">
-                {r.flagged && (
-                  <span className="text-destructive inline-flex items-center gap-1">
-                    <TriangleAlert className="size-4" />
-                    {r.flag_reason}
-                  </span>
-                )}
-              </td>
-              <td className="py-2 text-right">
-                <Button variant="ghost" size="icon" onClick={() => remove(r)} aria-label="Delete reading">
-                  <Trash2 />
-                </Button>
-              </td>
-            </tr>
-          ))}
+          {readings.map((r) =>
+            editing?.id === r.id ? (
+              <tr key={r.id} className="border-t">
+                <td className="py-2">
+                  <Input
+                    form="edit-reading"
+                    type="datetime-local"
+                    aria-label="Read at"
+                    value={editing.read_at}
+                    onChange={(e) => setEditing({ ...editing, read_at: e.target.value })}
+                    required
+                  />
+                </td>
+                <td className="py-2 pl-2">
+                  <Input
+                    form="edit-reading"
+                    type="number"
+                    step="any"
+                    min={0}
+                    aria-label={`Value (${meter.unit})`}
+                    className="text-right"
+                    value={editing.value}
+                    onChange={(e) => setEditing({ ...editing, value: e.target.value })}
+                    required
+                  />
+                </td>
+                <td className="py-2 pl-4" />
+                <td className="py-2 text-right whitespace-nowrap">
+                  <Button form="edit-reading" type="submit" variant="ghost" size="icon" aria-label="Save reading">
+                    <Check />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => setEditing(null)} aria-label="Cancel edit">
+                    <X />
+                  </Button>
+                </td>
+              </tr>
+            ) : (
+              <tr key={r.id} className="border-t">
+                <td className="py-2">{r.read_at ? new Date(r.read_at).toLocaleString() : ""}</td>
+                <td className="py-2 text-right tabular-nums">{r.value}</td>
+                <td className="py-2 pl-4">
+                  {r.flagged && (
+                    <span className="text-destructive inline-flex items-center gap-1">
+                      <TriangleAlert className="size-4" />
+                      {r.flag_reason}
+                    </span>
+                  )}
+                </td>
+                <td className="py-2 text-right whitespace-nowrap">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() =>
+                      setEditing({ id: r.id, value: String(r.value), read_at: toLocalInput(Number(r.read_at)) })
+                    }
+                    aria-label="Edit reading"
+                  >
+                    <Pencil />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => remove(r)} aria-label="Delete reading">
+                    <Trash2 />
+                  </Button>
+                </td>
+              </tr>
+            ),
+          )}
         </tbody>
       </table>
+      <form id="edit-reading" onSubmit={save} />
       {readings.length === 0 && <p className="text-muted-foreground text-sm">No readings yet.</p>}
     </div>
   );

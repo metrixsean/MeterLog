@@ -3,7 +3,7 @@ import { households, users, meters, readings, tariffs, billingPeriods } from "./
 import { authApi, signup, login, invite, changePassword } from "./api/auth.js";
 import { householdApi, getHousehold, renameHousehold, removeMember } from "./api/household.js";
 import { metersApi, listMeters, createMeter, getMeter, updateMeter, deleteMeter } from "./api/meters.js";
-import { readingsApi, listReadings, createReading, listFlaggedReadings, dismissReading, deleteReading } from "./api/readings.js";
+import { readingsApi, listReadings, createReading, listFlaggedReadings, dismissReading, updateReading, deleteReading } from "./api/readings.js";
 import { tariffsApi, listTariffs, createTariff, updateTariff, deleteTariff } from "./api/tariffs.js";
 import { usageApi, getUsage } from "./api/usage.js";
 import {
@@ -29,7 +29,7 @@ export default workspace("meterlog")
     signup, login, invite, changePassword,
     getHousehold, renameHousehold, removeMember,
     listMeters, createMeter, getMeter, updateMeter, deleteMeter,
-    listReadings, createReading, listFlaggedReadings, dismissReading, deleteReading,
+    listReadings, createReading, listFlaggedReadings, dismissReading, updateReading, deleteReading,
     listTariffs, createTariff, updateTariff, deleteTariff,
     getUsage,
     listBillingPeriods, createBillingPeriod, updateBillingPeriod, deleteBillingPeriod, getPeriodSummary,

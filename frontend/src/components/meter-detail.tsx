@@ -27,6 +27,7 @@ export function MeterDetail({ id }: { id: number }) {
   const [version, setVersion] = useState(0);
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     let live = true;
@@ -53,6 +54,7 @@ export function MeterDetail({ id }: { id: number }) {
     const data = new FormData(e.currentTarget);
     const serial = String(data.get("serial"));
     setError(null);
+    setBusy(true);
     try {
       const updated = await updateMeterRequest(id, {
         unit: String(data.get("unit")),
@@ -64,6 +66,8 @@ export function MeterDetail({ id }: { id: number }) {
       setVersion((v) => v + 1);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Request failed");
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -71,11 +75,13 @@ export function MeterDetail({ id }: { id: number }) {
     if (!meter) return;
     if (!window.confirm(`Delete this ${meter.kind} meter with all its readings, tariffs and bills?`)) return;
     setError(null);
+    setBusy(true);
     try {
       await deleteMeterRequest(id);
       navigate("/");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Request failed");
+      setBusy(false);
     }
   }
 
@@ -119,7 +125,7 @@ export function MeterDetail({ id }: { id: number }) {
           <Button variant="outline" size="icon" onClick={() => setEditing((v) => !v)} aria-label="Edit meter">
             <Pencil />
           </Button>
-          <Button variant="outline" size="icon" onClick={remove} aria-label="Delete meter">
+          <Button variant="outline" size="icon" onClick={remove} disabled={busy} aria-label="Delete meter">
             <Trash2 />
           </Button>
         </div>
@@ -153,7 +159,7 @@ export function MeterDetail({ id }: { id: number }) {
                 />
               </div>
               <div className="flex gap-2 sm:col-span-3">
-                <Button type="submit">Save</Button>
+                <Button type="submit" disabled={busy}>Save</Button>
                 <Button type="button" variant="outline" onClick={() => setEditing(false)}>
                   Cancel
                 </Button>

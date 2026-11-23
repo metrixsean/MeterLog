@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import {
   createReadingRequest,
   deleteReadingRequest,
+  fetchHousehold,
   fetchReadings,
   updateReadingRequest,
   type Meter,
@@ -22,6 +23,7 @@ function toLocalInput(ms: number) {
 
 export function MeterReadings({ meter, onSaved }: { meter: Pick<Meter, "id" | "unit">; onSaved: () => void }) {
   const [readings, setReadings] = useState<Reading[]>([]);
+  const [members, setMembers] = useState<Map<number, string>>(new Map());
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [editing, setEditing] = useState<{ id: number; value: string; read_at: string } | null>(null);
@@ -37,6 +39,14 @@ export function MeterReadings({ meter, onSaved }: { meter: Pick<Meter, "id" | "u
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    fetchHousehold()
+      .then((h) => setMembers(new Map(h.members.map((m) => [m.id, m.email]))))
+      .catch(() => {});
+  }, []);
+
+  const enteredBy = (id: number | null | undefined) => (id ? (members.get(id) ?? "") : "Removed member");
 
   async function add(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -128,6 +138,7 @@ export function MeterReadings({ meter, onSaved }: { meter: Pick<Meter, "id" | "u
           <tr>
             <th className="py-2 font-medium">Read at</th>
             <th className="py-2 text-right font-medium">Value</th>
+            <th className="py-2 pl-4 font-medium">Entered by</th>
             <th className="py-2 pl-4 font-medium">Status</th>
             <th className="py-2" />
           </tr>
@@ -159,6 +170,7 @@ export function MeterReadings({ meter, onSaved }: { meter: Pick<Meter, "id" | "u
                     required
                   />
                 </td>
+                <td className="text-muted-foreground py-2 pl-4">{enteredBy(r.entered_by)}</td>
                 <td className="py-2 pl-4" />
                 <td className="py-2 text-right whitespace-nowrap">
                   <Button form="edit-reading" type="submit" variant="ghost" size="icon" aria-label="Save reading">
@@ -173,6 +185,9 @@ export function MeterReadings({ meter, onSaved }: { meter: Pick<Meter, "id" | "u
               <tr key={r.id} className="border-t">
                 <td className="py-2">{r.read_at ? new Date(r.read_at).toLocaleString() : ""}</td>
                 <td className="py-2 text-right tabular-nums">{r.value}</td>
+                <td className={`py-2 pl-4 ${r.entered_by ? "" : "text-muted-foreground italic"}`}>
+                  {enteredBy(r.entered_by)}
+                </td>
                 <td className="py-2 pl-4">
                   {r.flagged && (
                     <span className="text-destructive inline-flex items-center gap-1">

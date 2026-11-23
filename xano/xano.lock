@@ -126,6 +126,9 @@
     "query:readings|GET|meters/{meter_id}/readings": {
       "guid": "714834af19a57fd4daaed663dab8ee7b"
     },
+    "query:readings|PATCH|meters/{meter_id}/readings/{reading_id}": {
+      "guid": "9b7b394295a933487b1323f0b504cef9"
+    },
     "query:readings|POST|create_reading": {
       "guid": "34acf2dcc9c36f64c11484951beebed5"
     },

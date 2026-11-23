@@ -182,6 +182,71 @@ export const dismissReading = query({
   ],
 });
 
+const editInput = { ...readingInput, value: c.decimal(1250), read_at: c.int(1767225600000) };
+
+export const updateReading = query({
+  name: "meters/{meter_id}/readings/{reading_id}",
+  verb: "PATCH",
+  apiGroup: readingsApi,
+  auth: users,
+  input: {
+    meter_id: input.int({ required: true }),
+    reading_id: input.int({ required: true }),
+    value: input.decimal({ required: true, min: 0 }),
+    read_at: input.timestamp({ required: true }),
+  },
+  stack: [
+    ...readingGuard({
+      "updates own reading": { ...ownReading, meter: { ...ownReading.meter, rollover_digits: 5 } },
+      "reading on another meter is not found": otherMeter,
+      "other household is not found": otherHousehold,
+    }),
+    s.function.run({
+      fn: checkReading,
+      input: {
+        meter_id: inp("meter_id"),
+        rollover_digits: ref("meter.rollover_digits"),
+        value: inp("value"),
+        read_at: inp("read_at"),
+        exclude_id: inp("reading_id"),
+      },
+      as: "check",
+      mock: { "updates own reading": c.obj({ flagged: false, flag_reason: null }) },
+    }),
+    s.db.edit({
+      table: readings,
+      fieldValue: inp("reading_id"),
+      row: {
+        value: inp("value"),
+        read_at: inp("read_at"),
+        flagged: ref("check.flagged"),
+        flag_reason: ref("check.flag_reason"),
+        dismissed: c.bool(false),
+      },
+      as: "updated",
+      mock: { "updates own reading": c.obj({ ...READING, value: 1250, flagged: false, flag_reason: null, dismissed: false }) },
+    }),
+  ],
+  response: ref("updated"),
+  tests: [
+    {
+      name: "updates own reading",
+      input: editInput,
+      expect: [expect.to_equal(resp("value"), c.int(1250)), expect.to_equal(resp("flagged"), c.bool(false))],
+    },
+    {
+      name: "reading on another meter is not found",
+      input: editInput,
+      expect: [expect.to_throw(c.text("Reading not found."))],
+    },
+    {
+      name: "other household is not found",
+      input: editInput,
+      expect: [expect.to_throw(c.text("Meter not found."))],
+    },
+  ],
+});
+
 export const deleteReading = query({
   name: "meters/{meter_id}/readings/{reading_id}",
   verb: "DELETE",

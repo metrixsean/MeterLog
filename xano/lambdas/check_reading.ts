@@ -5,8 +5,9 @@ export default function ({ $input, $var }: AmbientBindings) {
   const value = Number($input.value);
   const readAt = Number($input.read_at);
   const range = Math.pow(10, Number($input.rollover_digits));
+  const excludeId = Number($input.exclude_id ?? 0);
   const history: { value: number; read_at: number; dismissed: boolean }[] = ($var.history ?? [])
-    .filter((r: { flagged: boolean }) => !r.flagged)
+    .filter((r: { id: number; flagged: boolean }) => !r.flagged && Number(r.id) !== excludeId)
     .map((r: { value: number; read_at: number; dismissed: boolean }) => ({
       value: Number(r.value),
       read_at: Number(r.read_at),

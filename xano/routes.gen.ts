@@ -103,6 +103,7 @@ export const ROUTES = {
   "GET flagged_readings": { verb: "GET", path: "/api:readings/flagged_readings" },
   "GET meters/{meter_id}/readings": { verb: "GET", path: "/api:readings/meters/{meter_id}/readings" },
   "DELETE meters/{meter_id}/readings/{reading_id}": { verb: "DELETE", path: "/api:readings/meters/{meter_id}/readings/{reading_id}" },
+  "PATCH meters/{meter_id}/readings/{reading_id}": { verb: "PATCH", path: "/api:readings/meters/{meter_id}/readings/{reading_id}" },
   "POST meters/{meter_id}/readings/{reading_id}/dismiss": { verb: "POST", path: "/api:readings/meters/{meter_id}/readings/{reading_id}/dismiss" },
   "POST create_tariff": { verb: "POST", path: "/api:tariffs/create_tariff" },
   "GET meters/{meter_id}/tariffs": { verb: "GET", path: "/api:tariffs/meters/{meter_id}/tariffs" },
@@ -143,6 +144,7 @@ export function routePath(name: "POST create_reading"): string;
 export function routePath(name: "GET flagged_readings"): string;
 export function routePath(name: "GET meters/{meter_id}/readings", params: { "meter_id": string | number }): string;
 export function routePath(name: "DELETE meters/{meter_id}/readings/{reading_id}", params: { "meter_id": string | number; "reading_id": string | number }): string;
+export function routePath(name: "PATCH meters/{meter_id}/readings/{reading_id}", params: { "meter_id": string | number; "reading_id": string | number }): string;
 export function routePath(name: "POST meters/{meter_id}/readings/{reading_id}/dismiss", params: { "meter_id": string | number; "reading_id": string | number }): string;
 export function routePath(name: "POST create_tariff"): string;
 export function routePath(name: "GET meters/{meter_id}/tariffs", params: { "meter_id": string | number }): string;
@@ -246,6 +248,12 @@ export type RouteInputs = {
   "DELETE meters/{meter_id}/readings/{reading_id}": {
     meter_id: number;
     reading_id: number;
+  };
+  "PATCH meters/{meter_id}/readings/{reading_id}": {
+    meter_id: number;
+    reading_id: number;
+    value: number;
+    read_at: number | null;
   };
   "POST meters/{meter_id}/readings/{reading_id}/dismiss": {
     meter_id: number;

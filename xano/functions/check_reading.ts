@@ -19,6 +19,7 @@ export const checkReading = defineFunction({
     rollover_digits: input.int({ required: true }),
     value: input.decimal({ required: true }),
     read_at: input.timestamp({ required: true }),
+    exclude_id: input.int(),
   },
   stack: [
     s.db.query({
@@ -29,11 +30,15 @@ export const checkReading = defineFunction({
       ],
       sort: [{ sortBy: "read_at", dir: "desc" }],
       paging: { per_page: 200, metadata: false },
-      output: ["value", "read_at", "flagged", "dismissed"],
+      output: ["id", "value", "read_at", "flagged", "dismissed"],
       as: "history",
       mock: {
         "drop below previous is flagged": c.array([{ value: 500, read_at: T0, flagged: false }]),
         "rollover is not flagged": c.array([{ value: 995, read_at: T0, flagged: false }]),
+        "edited reading ignores its old row": c.array([
+          { id: 7, value: 500, read_at: T0, flagged: false },
+          { id: 8, value: 900, read_at: T0 + DAY / 2, flagged: false },
+        ]),
         "spike over 3x median is flagged": c.array(
           [3, 2, 1, 0].map((d) => ({ value: 100 - d * 10, read_at: T0 - d * DAY, flagged: false })),
         ),
@@ -67,6 +72,11 @@ export const checkReading = defineFunction({
         expect.to_be_false(resp("flagged")),
         expect.to_equal(resp("consumption"), c.int(10)),
       ],
+    },
+    {
+      name: "edited reading ignores its old row",
+      input: { ...at(600, T0 + DAY), exclude_id: c.int(8) },
+      expect: [expect.to_be_false(resp("flagged")), expect.to_equal(resp("consumption"), c.int(100))],
     },
     {
       name: "spike over 3x median is flagged",
